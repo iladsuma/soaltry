@@ -3,27 +3,148 @@
   "language": [
     { "question": "Sinonim dari 'Efisien' adalah...", "options": ["Tepat Guna", "Hemat", "Cepat", "Berdaya"], "answer": "Tepat Guna" },
     { "question": "Antonim dari 'Progresif' adalah...", "options": ["Stagnan", "Maju", "Aktif", "Regresif"], "answer": "Regresif" },
-    { "question": "Analogi: Haus : Air = Lapar : ...", "options": ["Makan", "Nasi", "Haus", "Kenyang"], "answer": "Nasi" }
+    { "question": "Analogi: Haus : Air = Lapar : ...", "options": ["Makan", "Nasi", "Haus", "Kenyang"], "answer": "Nasi" },
+    { "question": "Padanan kata dari 'Iterasi' adalah...", "options": ["Perulangan", "Pembagian", "Pengurangan", "Penjumlahan"], "answer": "Perulangan" },
+    { "question": "Sinonim dari 'Ambigu' adalah...", "options": ["Bermakna ganda", "Jelas", "Pasti", "Terang"], "answer": "Bermakna ganda" },
+    { "question": "Manakah penulisan yang baku?", "options": ["Apotik", "Apotek", "Apotika", "Apoteker"], "answer": "Apotek" },
+    { "question": "Antonim dari 'Sekuler' adalah...", "options": ["Duniawi", "Agamis", "Netral", "Bebas"], "answer": "Agamis" },
+    { "question": "Padanan kata 'Konfrontasi' adalah...", "options": ["Pertikaian", "Perdamaian", "Kesepakatan", "Pertemuan"], "answer": "Pertikaian" },
+    { "question": "Sinonim 'Fundamental' adalah...", "options": ["Mendasar", "Tambahan", "Sekunder", "Sepele"], "answer": "Mendasar" },
+    { "question": "Antonim 'Eksklusif' adalah...", "options": ["Umum", "Terbatas", "Khusus", "Istimewa"], "answer": "Umum" }
   ],
   "calculations": [
     { "question": "Berapakah 15% dari 200?", "options": ["20", "30", "40", "50"], "answer": "30" },
     { "question": "Jika x + 5 = 12, maka nilai x adalah...", "options": ["5", "7", "8", "9"], "answer": "7" },
-    { "question": "Hasil dari 12 x 12 - 44 adalah...", "options": ["100", "110", "120", "80"], "answer": "100" }
+    { "question": "Hasil dari 12 x 12 - 44 adalah...", "options": ["100", "110", "120", "80"], "answer": "100" },
+    { "question": "3, 6, 12, 24, ... Angka selanjutnya adalah?", "options": ["36", "42", "48", "50"], "answer": "48" },
+    { "question": "Jika 3 buku seharga Rp 15.000, berapa harga 5 buku?", "options": ["Rp 20.000", "Rp 25.000", "Rp 30.000", "Rp 35.000"], "answer": "Rp 25.000" },
+    { "question": "0,5 x 0,2 adalah...", "options": ["0,1", "0,01", "1,0", "0,11"], "answer": "0,1" },
+    { "question": "Berapakah akar kuadrat dari 144?", "options": ["10", "11", "12", "14"], "answer": "12" },
+    { "question": "Jika a=2 dan b=3, maka (a+b) kuadrat adalah...", "options": ["10", "13", "25", "26"], "answer": "25" },
+    { "question": "25% dari 80 adalah...", "options": ["15", "20", "25", "30"], "answer": "20" },
+    { "question": "Jika 10 orang menyelesaikan pekerjaan dalam 2 hari, berapa orang untuk 1 hari?", "options": ["5", "10", "15", "20"], "answer": "20" }
   ],
   "general_knowledge": [
     { "question": "Siapakah Presiden pertama Republik Indonesia?", "options": ["Soeharto", "Soekarno", "B.J. Habibie", "Gus Dur"], "answer": "Soekarno" },
-    { "question": "Ibu kota negara Jepang adalah...", "options": ["Seoul", "Beijing", "Tokyo", "Bangkok"], "answer": "Tokyo" }
+    { "question": "Ibu kota negara Jepang adalah...", "options": ["Seoul", "Beijing", "Tokyo", "Bangkok"], "answer": "Tokyo" },
+    { "question": "Planet manakah yang dijuluki Planet Merah?", "options": ["Venus", "Mars", "Jupiter", "Saturnus"], "answer": "Mars" },
+    { "question": "Mata uang negara Inggris adalah...", "options": ["Euro", "Dollar", "Poundsterling", "Yen"], "answer": "Poundsterling" },
+    { "question": "Benua terkecil di dunia adalah...", "options": ["Asia", "Eropa", "Australia", "Afrika"], "answer": "Australia" },
+    { "question": "Siapakah penemu bola lampu?", "options": ["Albert Einstein", "Isaac Newton", "Thomas Alva Edison", "Nikola Tesla"], "answer": "Thomas Alva Edison" },
+    { "question": "Negara dengan populasi terbanyak di dunia adalah...", "options": ["India", "Cina", "Amerika Serikat", "Indonesia"], "answer": "India" },
+    { "question": "Samudra terluas di dunia adalah...", "options": ["Hindia", "Atlantik", "Pasifik", "Arktik"], "answer": "Pasifik" },
+    { "question": "Lagu kebangsaan Indonesia Raya diciptakan oleh...", "options": ["Ibu Sud", "W.R. Supratman", "C. Simanjuntak", "Ismail Marzuki"], "answer": "W.R. Supratman" },
+    { "question": "Sandi Morse menggunakan kombinasi...", "options": ["Angka", "Huruf", "Titik dan Garis", "Warna"], "answer": "Titik dan Garis" }
   ],
   "patterns": [
-    { "question": "Lanjutkan pola: 1, 4, 9, 16, ...", "options": ["20", "25", "30", "36"], "answer": "25" },
-    { "question": "Lanjutkan pola: 2, 4, 8, 16, ...", "options": ["24", "30", "32", "64"], "answer": "32" }
+    { 
+      "question": "Lanjutkan pola urutan gambar berikut secara logis.", 
+      "options": ["Segitiga", "Persegi", "Lingkaran", "Bintang"], 
+      "answer": "Persegi",
+      "imageUrl": "https://picsum.photos/seed/pattern1/600/400",
+      "imageHint": "geometric pattern"
+    },
+    { 
+      "question": "Identifikasi bentuk yang melengkapi susunan pola di atas.", 
+      "options": ["A", "B", "C", "D"], 
+      "answer": "B",
+      "imageUrl": "https://picsum.photos/seed/pattern2/600/400",
+      "imageHint": "abstract logic"
+    },
+    { 
+      "question": "Jika gambar diputar 90 derajat searah jarum jam, manakah hasilnya?", 
+      "options": ["Opsi 1", "Opsi 2", "Opsi 3", "Opsi 4"], 
+      "answer": "Opsi 3",
+      "imageUrl": "https://picsum.photos/seed/pattern3/600/400",
+      "imageHint": "rotation logic"
+    },
+    { 
+      "question": "Pilih gambar yang tidak sesuai dengan kelompok pola ini.", 
+      "options": ["Gambar A", "Gambar B", "Gambar C", "Gambar D"], 
+      "answer": "Gambar D",
+      "imageUrl": "https://picsum.photos/seed/pattern4/600/400",
+      "imageHint": "odd one out"
+    },
+    { 
+      "question": "Lengkapi baris terakhir dari matriks gambar di atas.", 
+      "options": ["Atas", "Bawah", "Kiri", "Kanan"], 
+      "answer": "Atas",
+      "imageUrl": "https://picsum.photos/seed/pattern5/600/400",
+      "imageHint": "matrix reasoning"
+    }
   ],
   "abstraction": [
-    { "question": "Jika semua M adalah P, dan sebagian S adalah M, maka...", "options": ["Semua S adalah P", "Sebagian S adalah P", "Tidak ada S yang P", "Semua P adalah S"], "answer": "Sebagian S adalah P" },
-    { "question": "A > B, B < C, C = D. Hubungan A dan D adalah...", "options": ["A > D", "A < D", "A = D", "Tidak dapat ditentukan"], "answer": "Tidak dapat ditentukan" }
+    { 
+      "question": "Berdasarkan diagram logika di atas, apa kesimpulan yang paling tepat?", 
+      "options": ["Semua S adalah P", "Sebagian S adalah P", "Tidak ada S yang P", "Semua P adalah S"], 
+      "answer": "Sebagian S adalah P",
+      "imageUrl": "https://picsum.photos/seed/logic1/600/400",
+      "imageHint": "venn diagram"
+    },
+    { 
+      "question": "Manakah representasi visual yang tepat untuk hubungan variabel A > B?", 
+      "options": ["Grafik 1", "Grafik 2", "Grafik 3", "Grafik 4"], 
+      "answer": "Grafik 1",
+      "imageUrl": "https://picsum.photos/seed/logic2/600/400",
+      "imageHint": "logic relation"
+    },
+    { 
+      "question": "Identifikasi alur yang paling efisien dari titik A ke B.", 
+      "options": ["Jalur Merah", "Jalur Biru", "Jalur Hijau", "Jalur Kuning"], 
+      "answer": "Jalur Biru",
+      "imageUrl": "https://picsum.photos/seed/logic3/600/400",
+      "imageHint": "flowchart logic"
+    },
+    { 
+      "question": "Jika Premis 1 dan 2 benar, manakah gambar yang mewakili kesimpulan?", 
+      "options": ["Gambar A", "Gambar B", "Gambar C", "Gambar D"], 
+      "answer": "Gambar C",
+      "imageUrl": "https://picsum.photos/seed/logic4/600/400",
+      "imageHint": "syllogism visual"
+    },
+    { 
+      "question": "Pecahkan sandi simbolik yang ada pada tabel di atas.", 
+      "options": ["X = 5", "X = 10", "X = 15", "X = 20"], 
+      "answer": "X = 10",
+      "imageUrl": "https://picsum.photos/seed/logic5/600/400",
+      "imageHint": "symbolic table"
+    }
   ],
   "spatial": [
-    { "question": "Sebuah kubus memiliki berapa titik sudut?", "options": ["4", "6", "8", "12"], "answer": "8" },
-    { "question": "Jaring-jaring kubus terdiri dari berapa persegi?", "options": ["4", "5", "6", "8"], "answer": "6" }
+    { 
+      "question": "Manakah hasil lipatan yang benar dari jaring-jaring kubus tersebut?", 
+      "options": ["Kubus A", "Kubus B", "Kubus C", "Kubus D"], 
+      "answer": "Kubus B",
+      "imageUrl": "https://picsum.photos/seed/spatial1/600/400",
+      "imageHint": "cube folding"
+    },
+    { 
+      "question": "Berapa jumlah balok penyusun pada tumpukan gambar di atas?", 
+      "options": ["10", "12", "14", "16"], 
+      "answer": "14",
+      "imageUrl": "https://picsum.photos/seed/spatial2/600/400",
+      "imageHint": "block counting"
+    },
+    { 
+      "question": "Jika objek ini diputar secara horizontal 180 derajat, manakah hasilnya?", 
+      "options": ["Opsi A", "Opsi B", "Opsi C", "Opsi D"], 
+      "answer": "Opsi A",
+      "imageUrl": "https://picsum.photos/seed/spatial3/600/400",
+      "imageHint": "3d rotation"
+    },
+    { 
+      "question": "Manakah potongan yang tepat untuk melengkapi lubang pada benda 3D ini?", 
+      "options": ["Potongan 1", "Potongan 2", "Potongan 3", "Potongan 4"], 
+      "answer": "Potongan 4",
+      "imageUrl": "https://picsum.photos/seed/spatial4/600/400",
+      "imageHint": "spatial fit"
+    },
+    { 
+      "question": "Identifikasi bayangan cermin yang benar untuk objek di atas.", 
+      "options": ["Bayangan A", "Bayangan B", "Bayangan C", "Bayangan D"], 
+      "answer": "Bayangan B",
+      "imageUrl": "https://picsum.photos/seed/spatial5/600/400",
+      "imageHint": "mirror image"
+    }
   ]
 }
