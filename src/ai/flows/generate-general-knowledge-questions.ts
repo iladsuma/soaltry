@@ -14,8 +14,8 @@ const GenerateGeneralKnowledgeQuestionsInputSchema = z.object({
     .number()
     .int()
     .positive()
-    .default(5)
-    .describe('The number of general knowledge questions to generate.'),
+    .max(20)
+    .describe('The number of questions to generate (max 20 per batch).'),
 });
 export type GenerateGeneralKnowledgeQuestionsInput = z.infer<typeof GenerateGeneralKnowledgeQuestionsInputSchema>;
 
@@ -24,7 +24,7 @@ const GenerateGeneralKnowledgeQuestionsOutputSchema = z.object({
     .array(
       z.object({
         question: z.string().describe('The general knowledge question text.'),
-        options: z.array(z.string()).describe('An array of 4 possible answer options.'),
+        options: z.array(z.string()).length(4).describe('An array of exactly 4 possible answer options.'),
         answer: z
           .string()
           .describe('The exact text of the correct answer option from the provided options.'),
@@ -44,13 +44,15 @@ const generateGeneralKnowledgeQuestionsPrompt = ai.definePrompt({
   name: 'generateGeneralKnowledgeQuestionsPrompt',
   input: { schema: GenerateGeneralKnowledgeQuestionsInputSchema },
   output: { schema: GenerateGeneralKnowledgeQuestionsOutputSchema },
-  prompt: `You are an expert at creating general knowledge questions.
+  prompt: `You are an expert at creating general knowledge questions for an intellectual exam.
 
-Generate {{{count}}} general knowledge questions based on the following topics: {{{topics.join(', ')}}}.
+Generate exactly {{{count}}} general knowledge questions based on these topics: {{{topics.join(', ')}}}.
 
-Each question should be a multiple-choice question with 4 distinct options and a single correct answer. 
-
-For each question, provide: question, 4 options, and the exact answer string.`,
+Rules:
+1. Each question must have exactly 4 distinct options.
+2. The "answer" field must be the EXACT string of the correct option.
+3. Questions should be varied, interesting, and appropriate for a professional cognitive test.
+4. Output ONLY valid JSON following the provided schema.`,
 });
 
 const generateGeneralKnowledgeQuestionsFlow = ai.defineFlow(
@@ -63,12 +65,12 @@ const generateGeneralKnowledgeQuestionsFlow = ai.defineFlow(
     try {
       const { output } = await generateGeneralKnowledgeQuestionsPrompt(input);
       if (!output || !output.questions || output.questions.length === 0) {
-        throw new Error('Output AI kosong atau tidak valid.');
+        throw new Error('AI returned an empty list of questions.');
       }
       return output;
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error in generateGeneralKnowledgeQuestionsFlow:', error);
-      throw new Error('Gagal menghasilkan soal pengetahuan umum.');
+      throw new Error(`Gagal menghasilkan soal pengetahuan umum: ${error.message || 'Cek koneksi/kuota'}`);
     }
   }
 );

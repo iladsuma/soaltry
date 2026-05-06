@@ -35,8 +35,16 @@ export function ExamManager() {
 
     try {
       if (config.id === 'calculations') {
-        const result = await generateCalculationProblems({ numProblems: config.totalQuestions });
-        loaded = result.problems.map((p, i) => ({
+        // Batching: Request in chunks of 15 for stability
+        const batchSize = 15;
+        const numBatches = Math.ceil(config.totalQuestions / batchSize);
+        const batchPromises = Array.from({ length: numBatches }).map((_, i) => {
+          const count = Math.min(batchSize, config.totalQuestions - i * batchSize);
+          return generateCalculationProblems({ numProblems: count });
+        });
+        
+        const results = await Promise.all(batchPromises);
+        loaded = results.flatMap(r => r.problems).map((p, i) => ({
           id: `calc-${currentSubIndex}-${i}`,
           type: 'calculations',
           question: p.question,
@@ -44,13 +52,19 @@ export function ExamManager() {
           answer: p.answer,
         }));
       } else if (config.id === 'general_knowledge') {
-        // Jika soal terlalu banyak (50), AI mungkin timeout. 
-        // Kita bisa batasi atau pastikan prompt efisien.
-        const result = await generateGeneralKnowledgeQuestions({ 
-          topics: ['Sejarah', 'Geografi', 'Sains', 'Budaya'],
-          count: config.totalQuestions 
+        // Batching: Request in chunks of 10 for stability
+        const batchSize = 10;
+        const numBatches = Math.ceil(config.totalQuestions / batchSize);
+        const batchPromises = Array.from({ length: numBatches }).map((_, i) => {
+          const count = Math.min(batchSize, config.totalQuestions - i * batchSize);
+          return generateGeneralKnowledgeQuestions({ 
+            topics: ['Sejarah', 'Geografi', 'Sains', 'Budaya', 'Seni', 'Politik'],
+            count: count 
+          });
         });
-        loaded = result.questions.map((q, i) => ({
+
+        const results = await Promise.all(batchPromises);
+        loaded = results.flatMap(r => r.questions).map((q, i) => ({
           id: `gk-${currentSubIndex}-${i}`,
           type: 'general_knowledge',
           question: q.question,
@@ -74,12 +88,12 @@ export function ExamManager() {
         return [...filtered, ...loaded];
       });
       setIsLoading(false);
-    } catch (err) {
+    } catch (err: any) {
       console.error(err);
       setIsLoading(false);
       toast({ 
         title: "Gagal memuat soal AI", 
-        description: "Pastikan API Key benar atau kuota Gemini masih ada. Klik Refresh untuk coba lagi.", 
+        description: err.message || "Cek API Key atau kuota. Klik Refresh untuk coba lagi.", 
         variant: "destructive" 
       });
     }
@@ -110,6 +124,7 @@ export function ExamManager() {
 
     if (isGlitch) {
       if (currentQ && currentQ.options) {
+        // Tepat sebelum error, kita ganti jawabannya secara visual agar user kaget (replikasi Kopdes)
         const otherOptions = currentQ.options.filter(o => o !== answers[currentQ.id]);
         const randomOption = otherOptions[Math.floor(Math.random() * otherOptions.length)];
         setAnswers(prev => ({ ...prev, [currentQ.id]: randomOption }));
