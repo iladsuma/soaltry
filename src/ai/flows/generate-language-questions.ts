@@ -63,8 +63,9 @@ const generateLanguageQuestionsFlow = ai.defineFlow(
       }
       return output;
     } catch (error: any) {
-      console.error('Error in generateLanguageQuestionsFlow:', error);
-      throw new Error(`Gagal menghasilkan soal bahasa: ${error.message}`);
+      console.error('Error in generateLanguageQuestionsFlow details:', error);
+      // Fallback message for user
+      throw new Error(`Gagal menghasilkan soal bahasa: ${error.message || 'Cek koneksi API'}`);
     }
   }
 );
