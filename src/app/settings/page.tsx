@@ -7,24 +7,48 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import Link from "next/link";
-import { ArrowLeft, Settings2, FileJson, Save, RotateCcw, Upload, Info, CheckCircle2 } from "lucide-react";
+import { ArrowLeft, Settings2, FileJson, Save, RotateCcw, Upload, Info, CheckCircle2, ListChecks, BarChart3 } from "lucide-react";
 
 export default function SettingsPage() {
   const { toast } = useToast();
   const [jsonInput, setJsonInput] = useState("");
+  const [stats, setStats] = useState<Record<string, number>>({});
+  const [totalCount, setTotalCount] = useState(0);
+
+  const subtestKeys = ["lang_fast", "lang_tricky", "gen_fast", "gen_random", "calc_easy", "calc_mixed"];
+
+  const calculateStats = (jsonString: string) => {
+    try {
+      const parsed = JSON.parse(jsonString);
+      const newStats: Record<string, number> = {};
+      let total = 0;
+      
+      subtestKeys.forEach(key => {
+        const count = Array.isArray(parsed[key]) ? parsed[key].length : 0;
+        newStats[key] = count;
+        total += count;
+      });
+
+      setStats(newStats);
+      setTotalCount(total);
+    } catch (e) {
+      setStats({});
+      setTotalCount(0);
+    }
+  };
 
   useEffect(() => {
     const saved = localStorage.getItem("custom_exam_questions");
     if (saved) {
       setJsonInput(saved);
+      calculateStats(saved);
     }
   }, []);
 
   const handleSave = () => {
     try {
       const parsed = JSON.parse(jsonInput);
-      const requiredKeys = ["lang_fast", "lang_tricky", "gen_fast", "gen_random", "calc_easy", "calc_mixed"];
-      const missingKeys = requiredKeys.filter(key => !parsed[key]);
+      const missingKeys = subtestKeys.filter(key => !parsed[key]);
       
       if (missingKeys.length > 0) {
         toast({
@@ -36,9 +60,11 @@ export default function SettingsPage() {
       }
 
       localStorage.setItem("custom_exam_questions", jsonInput);
+      calculateStats(jsonInput);
+      
       toast({
         title: "Berhasil Disimpan",
-        description: "Bank soal kustom untuk 6 sub-tes intensif telah aktif.",
+        description: `Bank soal kustom aktif dengan total ${totalCount} soal.`,
       });
     } catch (e) {
       toast({
@@ -52,6 +78,8 @@ export default function SettingsPage() {
   const handleReset = () => {
     localStorage.removeItem("custom_exam_questions");
     setJsonInput("");
+    setStats({});
+    setTotalCount(0);
     toast({
       title: "Reset Berhasil",
       description: "Aplikasi sekarang menggunakan bank soal bawaan.",
@@ -66,6 +94,7 @@ export default function SettingsPage() {
     reader.onload = (event) => {
       const content = event.target?.result as string;
       setJsonInput(content);
+      calculateStats(content);
       toast({
         title: "File Terunggah",
         description: "Klik Simpan untuk menerapkan perubahan.",
@@ -86,11 +115,35 @@ export default function SettingsPage() {
             </Link>
             <div>
               <h1 className="text-3xl font-headline font-bold text-primary">Manajemen Bank Soal</h1>
-              <p className="text-muted-foreground">Konfigurasi 6 sub-tes (Total 228 Soal).</p>
+              <p className="text-muted-foreground">Konfigurasi 6 sub-tes (Total Target 228 Soal).</p>
             </div>
           </div>
           <Settings2 className="w-8 h-8 text-accent opacity-50" />
         </header>
+
+        {totalCount > 0 && (
+          <Card className="border-primary bg-primary/5 shadow-md">
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center gap-2 text-primary font-bold">
+                  <BarChart3 className="w-5 h-5" />
+                  <span>Status Bank Soal Aktif</span>
+                </div>
+                <div className="px-4 py-1 bg-primary text-white rounded-full font-black text-xl shadow-lg">
+                  {totalCount} <span className="text-xs font-normal opacity-80 uppercase">Soal</span>
+                </div>
+              </div>
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+                {subtestKeys.map(key => (
+                  <div key={key} className="flex justify-between items-center p-3 rounded-xl bg-white border shadow-sm">
+                    <span className="text-[10px] font-bold uppercase text-muted-foreground">{key.replace('_', ' ')}</span>
+                    <span className="font-black text-primary">{stats[key] || 0}</span>
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        )}
 
         <Card className="shadow-xl border-primary/10">
           <CardHeader>
@@ -103,14 +156,6 @@ export default function SettingsPage() {
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-6">
-            <div className="grid grid-cols-2 md:grid-cols-3 gap-2 pb-4">
-              {["lang_fast", "lang_tricky", "gen_fast", "gen_random", "calc_easy", "calc_mixed"].map(key => (
-                <div key={key} className="flex items-center gap-2 p-2 rounded-lg bg-muted/50 border text-[10px] font-bold uppercase text-muted-foreground">
-                  <CheckCircle2 className="w-3 h-3 text-primary" /> {key}
-                </div>
-              ))}
-            </div>
-
             <div className="space-y-2">
               <div className="flex justify-between items-center">
                 <Label htmlFor="json-input" className="text-sm font-bold uppercase tracking-wider text-muted-foreground">Data JSON</Label>
@@ -145,7 +190,10 @@ export default function SettingsPage() {
                 placeholder='{ "lang_fast": [...], "lang_tricky": [...], ... }'
                 className="min-h-[400px] font-mono text-xs leading-relaxed"
                 value={jsonInput}
-                onChange={(e) => setJsonInput(e.target.value)}
+                onChange={(e) => {
+                  setJsonInput(e.target.value);
+                  calculateStats(e.target.value);
+                }}
               />
             </div>
             
@@ -153,7 +201,7 @@ export default function SettingsPage() {
               <Link href="/">
                 <Button variant="ghost">Batal</Button>
               </Link>
-              <Button className="bg-primary px-10 gap-2 font-bold" onClick={handleSave}>
+              <Button className="bg-primary px-10 gap-2 font-bold shadow-lg" onClick={handleSave}>
                 <Save className="w-4 h-4" /> Simpan Bank Soal
               </Button>
             </div>
@@ -168,10 +216,9 @@ export default function SettingsPage() {
           </CardHeader>
           <CardContent>
             <ul className="text-xs text-muted-foreground space-y-2 list-disc pl-4">
-              <li><b>Bahasa (Fast/Tricky):</b> Sinonim kilat & Pemahaman makna tersirat.</li>
-              <li><b>Umum (Fast/Random):</b> Fakta instan & Wawasan luas bervariasi.</li>
-              <li><b>Hitungan (Easy/Mixed):</b> Aritmatika refleks & Analisis taktis.</li>
-              <li>Setiap kategori idealnya memiliki <b>38 soal</b> untuk mencapai total 228.</li>
+              <li>Setiap sub-tes (6 kategori) idealnya memiliki <b>38 soal</b> untuk mencapai target 228 soal.</li>
+              <li>Aplikasi akan mendeteksi jumlah soal per kategori secara otomatis di atas kotak input.</li>
+              <li>Pastikan format JSON valid agar sistem penskoran bekerja dengan benar.</li>
             </ul>
           </CardContent>
         </Card>
