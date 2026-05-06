@@ -2,18 +2,14 @@
 "use client";
 
 import { useState, useEffect, useCallback, useMemo } from "react";
-import { SUBTESTS, Question } from "@/lib/types";
-import { patternQuestions, abstractionQuestions, spatialQuestions, languageQuestions } from "@/lib/mock-data";
-import { generateCalculationProblems } from "@/ai/flows/generate-calculation-problems";
-import { generateGeneralKnowledgeQuestions } from "@/ai/flows/generate-general-knowledge-questions";
-import { generateLanguageQuestions } from "@/ai/flows/generate-language-questions";
+import { SUBTESTS, Question, SubTestType } from "@/lib/types";
+import examData from "@/lib/exam-questions.json";
 import { SubTestTimer } from "./SubTestTimer";
 import { QuestionCard } from "./QuestionCard";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { useToast } from "@/hooks/use-toast";
-import { ArrowRight, Loader2, Trophy, AlertCircle, RefreshCcw, WifiOff } from "lucide-react";
-import { Skeleton } from "@/components/ui/skeleton";
+import { ArrowRight, Loader2, Trophy, AlertCircle, Wifi } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 
 export function ExamManager() {
@@ -26,151 +22,39 @@ export function ExamManager() {
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
   const [isCompleted, setIsCompleted] = useState(false);
-  const [retryCount, setRetryCount] = useState(0);
-  const [isUsingFallback, setIsUsingFallback] = useState(false);
 
   const currentSubTest = SUBTESTS[currentSubIndex];
 
-  const fetchQuestions = useCallback(async () => {
+  // Memuat soal dari JSON lokal berdasarkan sub-tes saat ini
+  const loadQuestions = useCallback(() => {
     setIsLoading(true);
-    setIsUsingFallback(false);
-    let loaded: Question[] = [];
     const config = SUBTESTS[currentSubIndex];
+    
+    // Ambil data dari JSON berdasarkan ID sub-tes
+    const rawData = (examData as any)[config.id] || [];
+    
+    // Transformasi data agar memiliki ID unik
+    const loaded: Question[] = rawData.map((q: any, i: number) => ({
+      ...q,
+      id: `${config.id}-${currentSubIndex}-${i}`,
+      type: config.id as SubTestType
+    }));
 
-    try {
-      if (config.id === 'language') {
-        try {
-          const batchSize = 10;
-          const numBatches = Math.ceil(config.totalQuestions / batchSize);
-          const allBatchQuestions = [];
-          
-          for (let i = 0; i < numBatches; i++) {
-            const count = Math.min(batchSize, config.totalQuestions - i * batchSize);
-            const result = await generateLanguageQuestions({ count });
-            allBatchQuestions.push(...result.questions);
-            // Small delay to prevent rate limit
-            await new Promise(resolve => setTimeout(resolve, 500));
-          }
-          
-          loaded = allBatchQuestions.map((q, i) => ({
-            id: `lang-${currentSubIndex}-${i}`,
-            type: 'language',
-            question: q.question,
-            options: q.options,
-            answer: q.answer,
-          }));
-        } catch (aiError) {
-          console.warn("AI Language failed, using fallback", aiError);
-          setIsUsingFallback(true);
-          loaded = languageQuestions.slice(0, config.totalQuestions).map((q, i) => ({
-            ...q,
-            id: `lang-fallback-${currentSubIndex}-${i}`
-          }));
-        }
-      } else if (config.id === 'calculations') {
-        try {
-          const batchSize = 10;
-          const numBatches = Math.ceil(config.totalQuestions / batchSize);
-          const allBatchProblems = [];
+    setQuestions(loaded);
+    
+    // Rekam semua soal untuk keperluan penskoran di akhir
+    setAllQuestionsRecord(prev => {
+      const filtered = prev.filter(p => !loaded.find(l => l.id === p.id));
+      return [...filtered, ...loaded];
+    });
 
-          for (let i = 0; i < numBatches; i++) {
-            const count = Math.min(batchSize, config.totalQuestions - i * batchSize);
-            const result = await generateCalculationProblems({ numProblems: count });
-            allBatchProblems.push(...result.problems);
-            await new Promise(resolve => setTimeout(resolve, 500));
-          }
-
-          loaded = allBatchProblems.map((p, i) => ({
-            id: `calc-${currentSubIndex}-${i}`,
-            type: 'calculations',
-            question: p.question,
-            options: p.options,
-            answer: p.answer,
-          }));
-        } catch (aiError) {
-          console.warn("AI Calculations failed, using fallback", aiError);
-          setIsUsingFallback(true);
-          // Simple local calculation mock for emergency
-          loaded = Array.from({ length: config.totalQuestions }).map((_, i) => ({
-            id: `calc-fallback-${i}`,
-            type: 'calculations',
-            question: `Berapakah ${10 + i} + ${20 + i}?`,
-            options: [String(30 + 2*i), String(30 + i), String(40 + i), String(25 + i)],
-            answer: String(30 + 2*i),
-          }));
-        }
-      } else if (config.id === 'general_knowledge') {
-        try {
-          const batchSize = 10;
-          const numBatches = Math.ceil(config.totalQuestions / batchSize);
-          const allBatchQuestions = [];
-
-          for (let i = 0; i < numBatches; i++) {
-            const count = Math.min(batchSize, config.totalQuestions - i * batchSize);
-            const result = await generateGeneralKnowledgeQuestions({ 
-              topics: ['Sejarah Indonesia', 'Geografi', 'Sains Dasar', 'Budaya Pop', 'Politik'],
-              count: count 
-            });
-            allBatchQuestions.push(...result.questions);
-            await new Promise(resolve => setTimeout(resolve, 500));
-          }
-
-          loaded = allBatchQuestions.map((q, i) => ({
-            id: `gk-${currentSubIndex}-${i}`,
-            type: 'general_knowledge',
-            question: q.question,
-            options: q.options,
-            answer: q.answer,
-          }));
-        } catch (aiError) {
-          console.warn("AI GK failed, using fallback", aiError);
-          setIsUsingFallback(true);
-          loaded = Array.from({ length: config.totalQuestions }).map((_, i) => ({
-            id: `gk-fallback-${i}`,
-            type: 'general_knowledge',
-            question: `Contoh Pertanyaan Umum #${i + 1}`,
-            options: ['Opsi A', 'Opsi B', 'Opsi C', 'Opsi D'],
-            answer: 'Opsi A',
-          }));
-        }
-      } else {
-        const mockMap: Record<string, Question[]> = {
-          patterns: patternQuestions,
-          abstraction: abstractionQuestions,
-          spatial: spatialQuestions
-        };
-        loaded = [...(mockMap[config.id] || [])].slice(0, config.totalQuestions);
-        loaded = loaded.map((q, i) => ({ ...q, id: `${q.id}-${currentSubIndex}` }));
-      }
-      
-      setQuestions(loaded);
-      setAllQuestionsRecord(prev => {
-        const filtered = prev.filter(p => !loaded.find(l => l.id === p.id));
-        return [...filtered, ...loaded];
-      });
-      setIsLoading(false);
-      
-      if (isUsingFallback) {
-        toast({
-          title: "Mode Offline Aktif",
-          description: "Gagal terhubung ke AI (Kuota Habis). Menggunakan bank soal cadangan agar ujian tetap lancar.",
-        });
-      }
-    } catch (err: any) {
-      console.error(err);
-      setIsLoading(false);
-      toast({ 
-        title: "Kesalahan Sistem", 
-        description: "Gagal memuat soal. Silakan coba lagi.", 
-        variant: "destructive" 
-      });
-    }
-  }, [currentSubIndex, toast, isUsingFallback]);
+    setIsLoading(false);
+  }, [currentSubIndex]);
 
   useEffect(() => {
-    fetchQuestions();
+    loadQuestions();
     setCurrentQIndex(0);
-  }, [fetchQuestions, retryCount]);
+  }, [loadQuestions]);
 
   const handleNextSubTest = useCallback(() => {
     if (currentSubIndex < SUBTESTS.length - 1) {
@@ -184,22 +68,20 @@ export function ExamManager() {
     setIsSaving(true);
     const currentQ = questions[currentQIndex];
     
-    await new Promise(resolve => setTimeout(resolve, 800));
+    // Simulasi delay penyimpanan
+    await new Promise(resolve => setTimeout(resolve, 500));
     
-    // REPLIKASI GLITCH KOPDES (40% probabilitas)
-    const isGlitch = Math.random() < 0.4;
-
-    if (isGlitch) {
-      if (currentQ && currentQ.options) {
-        const otherOptions = currentQ.options.filter(o => o !== answers[currentQ.id]);
-        const randomOption = otherOptions[Math.floor(Math.random() * otherOptions.length)];
-        setAnswers(prev => ({ ...prev, [currentQ.id]: randomOption }));
-      }
-
+    // REPLIKASI GLITCH KOPDES (Ganti jawaban secara acak 20% kemungkinan)
+    const isGlitch = Math.random() < 0.2;
+    if (isGlitch && currentQ && currentQ.options) {
+      const otherOptions = currentQ.options.filter(o => o !== answers[currentQ.id]);
+      const randomOption = otherOptions[Math.floor(Math.random() * otherOptions.length)];
+      setAnswers(prev => ({ ...prev, [currentQ.id]: randomOption }));
+      
       setIsSaving(false);
       toast({
-        title: "Koneksi Tidak Stabil",
-        description: "Status simpan: GAGAL (Sync Error). Jawaban mungkin berubah. Silakan periksa kembali.",
+        title: "Sync Error (Kopdes)",
+        description: "Data tersimpan namun ada anomali sinkronisasi. Silakan periksa kembali.",
         variant: "destructive",
       });
       return;
@@ -263,11 +145,9 @@ export function ExamManager() {
             </div>
           </CardContent>
         </Card>
-        <div className="flex flex-col gap-4 w-full max-w-xs">
-          <Button size="lg" className="rounded-full shadow-lg" onClick={() => window.location.href = "/"}>
-            Kembali ke Beranda
-          </Button>
-        </div>
+        <Button size="lg" className="rounded-full px-12" onClick={() => window.location.href = "/"}>
+          Kembali ke Beranda
+        </Button>
       </div>
     );
   }
@@ -280,11 +160,9 @@ export function ExamManager() {
         <div className="space-y-1">
           <span className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground/60">Sub-Tes {currentSubIndex + 1} / {SUBTESTS.length}</span>
           <h2 className="text-2xl font-headline font-bold text-primary">{currentSubTest.name}</h2>
-          {isUsingFallback && (
-            <div className="flex items-center gap-1 text-[10px] text-amber-600 font-bold uppercase">
-              <WifiOff className="w-3 h-3" /> Offline Mode Active
-            </div>
-          )}
+          <div className="flex items-center gap-1 text-[10px] text-green-600 font-bold uppercase">
+            <Wifi className="w-3 h-3" /> Local Database Mode
+          </div>
         </div>
         <SubTestTimer 
           key={`timer-${currentSubIndex}`}
@@ -296,22 +174,18 @@ export function ExamManager() {
 
       <Progress value={progressPercent} className="h-2 bg-white border" />
 
-      <div className="min-h-[450px]">
-        {isLoading ? (
-          <div className="space-y-6 max-w-2xl mx-auto w-full">
-            <Skeleton className="h-10 w-1/3" />
-            <Skeleton className="h-32 w-full" />
-            <div className="grid gap-3">
-              {[1, 2, 3, 4].map(i => <Skeleton key={i} className="h-16 w-full" />)}
-            </div>
-          </div>
-        ) : (
+      <div className="min-h-[400px] flex flex-col justify-center">
+        {!isLoading && questions.length > 0 ? (
           <QuestionCard 
             key={questions[currentQIndex]?.id} 
             question={questions[currentQIndex]} 
             value={answers[questions[currentQIndex]?.id] || ''} 
             onChange={updateAnswer} 
           />
+        ) : (
+          <div className="text-center p-12 bg-white rounded-xl border border-dashed">
+            <p className="text-muted-foreground">Memuat database soal lokal...</p>
+          </div>
         )}
       </div>
 
@@ -340,7 +214,7 @@ export function ExamManager() {
       
       <div className="flex items-center justify-center gap-2 text-[10px] text-muted-foreground/40 uppercase tracking-[0.3em]">
         <AlertCircle className="w-3 h-3" />
-        Kopdes Sync Active (Simulation Mode)
+        Stable Local Session Active
       </div>
     </div>
   );

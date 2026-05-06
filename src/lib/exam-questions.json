@@ -1,0 +1,29 @@
+
+{
+  "language": [
+    { "question": "Sinonim dari 'Efisien' adalah...", "options": ["Tepat Guna", "Hemat", "Cepat", "Berdaya"], "answer": "Tepat Guna" },
+    { "question": "Antonim dari 'Progresif' adalah...", "options": ["Stagnan", "Maju", "Aktif", "Regresif"], "answer": "Regresif" },
+    { "question": "Analogi: Haus : Air = Lapar : ...", "options": ["Makan", "Nasi", "Haus", "Kenyang"], "answer": "Nasi" }
+  ],
+  "calculations": [
+    { "question": "Berapakah 15% dari 200?", "options": ["20", "30", "40", "50"], "answer": "30" },
+    { "question": "Jika x + 5 = 12, maka nilai x adalah...", "options": ["5", "7", "8", "9"], "answer": "7" },
+    { "question": "Hasil dari 12 x 12 - 44 adalah...", "options": ["100", "110", "120", "80"], "answer": "100" }
+  ],
+  "general_knowledge": [
+    { "question": "Siapakah Presiden pertama Republik Indonesia?", "options": ["Soeharto", "Soekarno", "B.J. Habibie", "Gus Dur"], "answer": "Soekarno" },
+    { "question": "Ibu kota negara Jepang adalah...", "options": ["Seoul", "Beijing", "Tokyo", "Bangkok"], "answer": "Tokyo" }
+  ],
+  "patterns": [
+    { "question": "Lanjutkan pola: 1, 4, 9, 16, ...", "options": ["20", "25", "30", "36"], "answer": "25" },
+    { "question": "Lanjutkan pola: 2, 4, 8, 16, ...", "options": ["24", "30", "32", "64"], "answer": "32" }
+  ],
+  "abstraction": [
+    { "question": "Jika semua M adalah P, dan sebagian S adalah M, maka...", "options": ["Semua S adalah P", "Sebagian S adalah P", "Tidak ada S yang P", "Semua P adalah S"], "answer": "Sebagian S adalah P" },
+    { "question": "A > B, B < C, C = D. Hubungan A dan D adalah...", "options": ["A > D", "A < D", "A = D", "Tidak dapat ditentukan"], "answer": "Tidak dapat ditentukan" }
+  ],
+  "spatial": [
+    { "question": "Sebuah kubus memiliki berapa titik sudut?", "options": ["4", "6", "8", "12"], "answer": "8" },
+    { "question": "Jaring-jaring kubus terdiri dari berapa persegi?", "options": ["4", "5", "6", "8"], "answer": "6" }
+  ]
+}
