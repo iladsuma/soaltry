@@ -32,10 +32,15 @@ const generateCalculationProblemsPrompt = ai.definePrompt({
   name: 'generateCalculationProblemsPrompt',
   input: { schema: GenerateCalculationProblemsInputSchema },
   output: { schema: GenerateCalculationProblemsOutputSchema },
-  prompt: `You are a high-precision math problem generator. 
-  Create exactly {{numProblems}} unique calculation problems.
+  prompt: `You are a high-precision math problem generator for a cognitive test. 
+  Create exactly {{numProblems}} unique calculation problems in Indonesian.
   Each problem MUST be multiple choice with exactly 4 options.
   The "answer" field MUST match one of the options exactly.
+  
+  Format:
+  Question: "Berapakah 15% dari 200?"
+  Options: ["20", "30", "40", "50"]
+  Answer: "30"
   
   Output ONLY valid JSON.`,
 });

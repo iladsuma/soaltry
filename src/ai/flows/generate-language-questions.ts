@@ -1,7 +1,7 @@
 
 'use server';
 /**
- * @fileOverview A Genkit flow for generating Indonesian language questions.
+ * @fileOverview A Genkit flow for generating Indonesian language questions using Gemini 2.0.
  */
 
 import { ai } from '@/ai/genkit';
@@ -33,13 +33,21 @@ const generateLanguageQuestionsPrompt = ai.definePrompt({
   input: { schema: GenerateLanguageQuestionsInputSchema },
   output: { schema: GenerateLanguageQuestionsOutputSchema },
   prompt: `You are an expert Indonesian linguist.
-  Generate exactly {{count}} unique Indonesian language questions (Sinonim, Antonim, Analogi).
+  Generate exactly {{count}} unique Indonesian language questions for a high-level cognitive exam.
+  Include categories: Sinonim (Persamaan Kata), Antonim (Lawan Kata), and Analogi (Padanan Hubungan).
   
   Rules:
   1. Each question MUST be in Indonesian.
   2. Each question MUST have exactly 4 options.
   3. The "answer" MUST be exactly one of the options.
-  4. Output ONLY valid JSON.`,
+  4. Ensure questions are challenging and appropriate for professionals.
+  
+  Example Analogi:
+  Question: "KONTRAKTOR : BETON = ..."
+  Options: ["Pengacara : Hukum", "Sopir : Kendaraan", "Tukang : Kayu", "Guru : Murid"]
+  Answer: "Tukang : Kayu"
+  
+  Output ONLY valid JSON.`,
 });
 
 const generateLanguageQuestionsFlow = ai.defineFlow(
@@ -55,7 +63,7 @@ const generateLanguageQuestionsFlow = ai.defineFlow(
       return output;
     } catch (error: any) {
       console.error('Error in generateLanguageQuestionsFlow:', error);
-      throw new Error(`Gagal: ${error.message}`);
+      throw new Error(`Gagal menghasilkan soal bahasa: ${error.message}`);
     }
   }
 );
