@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
@@ -10,7 +11,7 @@ import { QuestionCard } from "./QuestionCard";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { useToast } from "@/hooks/use-toast";
-import { ChevronRight, Save, CheckCircle2, AlertTriangle, ArrowRight } from "lucide-react";
+import { ChevronRight, Save, CheckCircle2, AlertTriangle, ArrowRight, Loader2 } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 
 export function ExamManager() {
@@ -20,8 +21,8 @@ export function ExamManager() {
   const [questions, setQuestions] = useState<Question[]>([]);
   const [answers, setAnswers] = useState<Record<string, string | number>>({});
   const [isLoading, setIsLoading] = useState(true);
+  const [isSaving, setIsSaving] = useState(false);
   const [isCompleted, setIsCompleted] = useState(false);
-  const [errorSimulated, setErrorSimulated] = useState(false);
 
   const currentSubTest = SUBTESTS[currentSubIndex];
 
@@ -34,7 +35,7 @@ export function ExamManager() {
       if (config.id === 'calculations') {
         const result = await generateCalculationProblems({ numProblems: config.totalQuestions });
         loaded = result.problems.map((p, i) => ({
-          id: `calc-${i}`,
+          id: `calc-${currentSubIndex}-${i}`,
           type: 'calculations',
           question: p.question,
           answer: p.answer,
@@ -45,7 +46,7 @@ export function ExamManager() {
           count: config.totalQuestions 
         });
         loaded = result.questions.map((q, i) => ({
-          id: `gk-${i}`,
+          id: `gk-${currentSubIndex}-${i}`,
           type: 'general_knowledge',
           question: q.question,
           options: q.options,
@@ -60,6 +61,8 @@ export function ExamManager() {
           spatial: spatialQuestions
         };
         loaded = mockMap[config.id] || [];
+        // Ensure unique IDs per sub-test run
+        loaded = loaded.map((q, i) => ({ ...q, id: `${q.id}-${currentSubIndex}` }));
       }
       setQuestions(loaded);
     } catch (err) {
@@ -84,20 +87,12 @@ export function ExamManager() {
   };
 
   const handleSaveAndContinue = async () => {
-    // Simulated Save Failure (40% chance)
-    const shouldFail = Math.random() < 0.4;
+    setIsSaving(true);
     
-    if (shouldFail) {
-      setErrorSimulated(true);
-      toast({
-        title: "Kesalahan Penyimpanan!",
-        description: "Gagal menyimpan jawaban. Mohon klik simpan kembali.",
-        variant: "destructive"
-      });
-      return;
-    }
+    // Simulate a small network delay for a more natural feel without random errors
+    await new Promise(resolve => setTimeout(resolve, 300));
 
-    setErrorSimulated(false);
+    setIsSaving(false);
     
     if (currentQIndex < questions.length - 1) {
       setCurrentQIndex(prev => prev + 1);
@@ -131,7 +126,7 @@ export function ExamManager() {
   }
 
   const currentQuestion = questions[currentQIndex];
-  const progressPercent = ((currentSubIndex * 100) + ((currentQIndex / questions.length) * 100)) / SUBTESTS.length;
+  const progressPercent = ((currentSubIndex * 100) + ((currentQIndex / Math.max(1, questions.length)) * 100)) / SUBTESTS.length;
 
   return (
     <div className="max-w-4xl mx-auto space-y-8 animate-in slide-in-from-bottom-4 duration-500">
@@ -169,6 +164,7 @@ export function ExamManager() {
           </div>
         ) : currentQuestion ? (
           <QuestionCard 
+            key={currentQuestion.id} // Sangat penting: Mereset UI saat soal berubah
             question={currentQuestion} 
             value={answers[currentQuestion.id] || ''} 
             onChange={updateAnswer} 
@@ -189,18 +185,18 @@ export function ExamManager() {
             size="lg" 
             className="flex-1 sm:flex-none rounded-full"
             onClick={() => setCurrentQIndex(prev => Math.max(0, prev - 1))}
-            disabled={currentQIndex === 0 || isLoading}
+            disabled={currentQIndex === 0 || isLoading || isSaving}
           >
             Sebelumnya
           </Button>
           <Button 
             size="lg" 
-            className={`flex-1 sm:flex-none rounded-full shadow-lg transition-all ${errorSimulated ? 'bg-destructive hover:bg-destructive/90 animate-shake' : 'bg-primary hover:bg-primary/90'}`}
+            className="flex-1 sm:flex-none rounded-full shadow-lg transition-all bg-primary hover:bg-primary/90"
             onClick={handleSaveAndContinue}
-            disabled={isLoading}
+            disabled={isLoading || isSaving}
           >
-            {errorSimulated ? (
-              <>Simpan Kembali <AlertTriangle className="ml-2 w-4 h-4" /></>
+            {isSaving ? (
+              <Loader2 className="w-4 h-4 animate-spin" />
             ) : (
               <>Simpan & Lanjut <ArrowRight className="ml-2 w-4 h-4" /></>
             )}
