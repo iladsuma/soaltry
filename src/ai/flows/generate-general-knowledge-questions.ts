@@ -1,10 +1,6 @@
 'use server';
 /**
  * @fileOverview A Genkit flow for generating general knowledge questions.
- *
- * - generateGeneralKnowledgeQuestions - A function that handles the generation of general knowledge questions.
- * - GenerateGeneralKnowledgeQuestionsInput - The input type for the generateGeneralKnowledgeQuestions function.
- * - GenerateGeneralKnowledgeQuestionsOutput - The return type for the generateGeneralKnowledgeQuestions function.
  */
 
 import { ai } from '@/ai/genkit';
@@ -52,9 +48,9 @@ const generateGeneralKnowledgeQuestionsPrompt = ai.definePrompt({
 
 Generate {{{count}}} general knowledge questions based on the following topics: {{{topics.join(', ')}}}.
 
-Each question should be a multiple-choice question with 4 distinct options and a single correct answer. Ensure the questions are diverse and cover various aspects of the given topics.
+Each question should be a multiple-choice question with 4 distinct options and a single correct answer. 
 
-For each question, provide the question text, an array of four answer options, and the exact text of the correct answer option from the provided options.`,
+For each question, provide: question, 4 options, and the exact answer string.`,
 });
 
 const generateGeneralKnowledgeQuestionsFlow = ai.defineFlow(
@@ -64,7 +60,15 @@ const generateGeneralKnowledgeQuestionsFlow = ai.defineFlow(
     outputSchema: GenerateGeneralKnowledgeQuestionsOutputSchema,
   },
   async (input) => {
-    const { output } = await generateGeneralKnowledgeQuestionsPrompt(input);
-    return output!;
+    try {
+      const { output } = await generateGeneralKnowledgeQuestionsPrompt(input);
+      if (!output || !output.questions || output.questions.length === 0) {
+        throw new Error('Output AI kosong atau tidak valid.');
+      }
+      return output;
+    } catch (error) {
+      console.error('Error in generateGeneralKnowledgeQuestionsFlow:', error);
+      throw new Error('Gagal menghasilkan soal pengetahuan umum.');
+    }
   }
 );

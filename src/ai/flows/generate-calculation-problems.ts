@@ -34,18 +34,7 @@ const generateCalculationProblemsPrompt = ai.definePrompt({
   prompt: `You are a math problem generator for a cognitive exam. 
   Create exactly {{numProblems}} unique calculation problems.
   Each problem must be multiple choice with 4 options.
-  
-  Example Output:
-  {
-    "problems": [
-      {
-        "question": "What is 15% of 200?",
-        "options": ["20", "25", "30", "35"],
-        "answer": "30",
-        "type": "percentage"
-      }
-    ]
-  }
+  Make questions challenging but solvable without a calculator.
   
   Generate {{numProblems}} varied problems.`,
 });
@@ -57,10 +46,15 @@ const generateCalculationProblemsFlow = ai.defineFlow(
     outputSchema: GenerateCalculationProblemsOutputSchema,
   },
   async (input) => {
-    const { output } = await generateCalculationProblemsPrompt(input);
-    if (!output) {
-      throw new Error('Failed to generate calculation problems.');
+    try {
+      const { output } = await generateCalculationProblemsPrompt(input);
+      if (!output || !output.problems || output.problems.length === 0) {
+        throw new Error('Output AI kosong atau tidak valid.');
+      }
+      return output;
+    } catch (error) {
+      console.error('Error in generateCalculationProblemsFlow:', error);
+      throw new Error('Gagal menghasilkan soal hitungan. Cek API Key atau kuota.');
     }
-    return output;
   }
 );

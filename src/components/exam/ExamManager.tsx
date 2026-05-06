@@ -10,7 +10,7 @@ import { QuestionCard } from "./QuestionCard";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { useToast } from "@/hooks/use-toast";
-import { ArrowRight, Loader2, Trophy, AlertCircle } from "lucide-react";
+import { ArrowRight, Loader2, Trophy, AlertCircle, RefreshCcw } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Card, CardContent } from "@/components/ui/card";
 
@@ -24,6 +24,7 @@ export function ExamManager() {
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
   const [isCompleted, setIsCompleted] = useState(false);
+  const [retryCount, setRetryCount] = useState(0);
 
   const currentSubTest = SUBTESTS[currentSubIndex];
 
@@ -43,8 +44,10 @@ export function ExamManager() {
           answer: p.answer,
         }));
       } else if (config.id === 'general_knowledge') {
+        // Jika soal terlalu banyak (50), AI mungkin timeout. 
+        // Kita bisa batasi atau pastikan prompt efisien.
         const result = await generateGeneralKnowledgeQuestions({ 
-          topics: ['Sejarah Indonesia', 'Geografi Dunia', 'Sains Dasar', 'Tokoh Nasional', 'Budaya Populer'],
+          topics: ['Sejarah', 'Geografi', 'Sains', 'Budaya'],
           count: config.totalQuestions 
         });
         loaded = result.questions.map((q, i) => ({
@@ -64,24 +67,28 @@ export function ExamManager() {
         loaded = [...(mockMap[config.id] || [])].slice(0, config.totalQuestions);
         loaded = loaded.map((q, i) => ({ ...q, id: `${q.id}-${currentSubIndex}` }));
       }
+      
       setQuestions(loaded);
       setAllQuestionsRecord(prev => {
-        // Gabungkan soal unik agar bisa diskor di akhir
         const filtered = prev.filter(p => !loaded.find(l => l.id === p.id));
         return [...filtered, ...loaded];
       });
+      setIsLoading(false);
     } catch (err) {
       console.error(err);
-      toast({ title: "Gagal memuat soal", description: "Cek koneksi atau kuota API Gemini.", variant: "destructive" });
-    } finally {
       setIsLoading(false);
+      toast({ 
+        title: "Gagal memuat soal AI", 
+        description: "Pastikan API Key benar atau kuota Gemini masih ada. Klik Refresh untuk coba lagi.", 
+        variant: "destructive" 
+      });
     }
   }, [currentSubIndex, toast]);
 
   useEffect(() => {
     fetchQuestions();
     setCurrentQIndex(0);
-  }, [fetchQuestions]);
+  }, [fetchQuestions, retryCount]);
 
   const handleNextSubTest = useCallback(() => {
     if (currentSubIndex < SUBTESTS.length - 1) {
@@ -103,7 +110,6 @@ export function ExamManager() {
 
     if (isGlitch) {
       if (currentQ && currentQ.options) {
-        // Secara jahat mengubah jawaban ke opsi acak lain sebelum error muncul
         const otherOptions = currentQ.options.filter(o => o !== answers[currentQ.id]);
         const randomOption = otherOptions[Math.floor(Math.random() * otherOptions.length)];
         setAnswers(prev => ({ ...prev, [currentQ.id]: randomOption }));
@@ -194,7 +200,6 @@ export function ExamManager() {
           <span className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground/60">Sub-Tes {currentSubIndex + 1} / {SUBTESTS.length}</span>
           <h2 className="text-2xl font-headline font-bold text-primary">{currentSubTest.name}</h2>
         </div>
-        {/* KEY adalah rahasia untuk mereset timer setiap sub-tes */}
         <SubTestTimer 
           key={`timer-${currentSubIndex}`}
           initialSeconds={currentSubTest.duration} 
@@ -214,15 +219,20 @@ export function ExamManager() {
               {[1, 2, 3, 4].map(i => <Skeleton key={i} className="h-16 w-full" />)}
             </div>
           </div>
-        ) : questions[currentQIndex] ? (
+        ) : questions.length === 0 ? (
+          <div className="flex flex-col items-center justify-center py-20 gap-4 text-center">
+            <p className="text-destructive font-medium">Gagal memuat soal dari AI.</p>
+            <Button variant="outline" onClick={() => setRetryCount(prev => prev + 1)}>
+              <RefreshCcw className="w-4 h-4 mr-2" /> Coba Lagi
+            </Button>
+          </div>
+        ) : (
           <QuestionCard 
-            key={questions[currentQIndex].id} 
+            key={questions[currentQIndex]?.id} 
             question={questions[currentQIndex]} 
-            value={answers[questions[currentQIndex].id] || ''} 
+            value={answers[questions[currentQIndex]?.id] || ''} 
             onChange={updateAnswer} 
           />
-        ) : (
-          <div className="text-center py-20">Memuat soal...</div>
         )}
       </div>
 
@@ -242,7 +252,7 @@ export function ExamManager() {
           <Button 
             className="rounded-full px-10 shadow-lg bg-primary hover:bg-primary/90"
             onClick={handleSaveAndContinue}
-            disabled={isLoading || isSaving}
+            disabled={isLoading || isSaving || questions.length === 0}
           >
             {isSaving ? <Loader2 className="w-4 h-4 animate-spin" /> : <>Simpan & Lanjut <ArrowRight className="ml-2 w-4 h-4" /></>}
           </Button>
