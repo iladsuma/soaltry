@@ -1,3 +1,22 @@
 {
-  "placeholderImages": []
+  "placeholderImages": [
+    {
+      "id": "pattern-abstract-1",
+      "description": "Pola geometri abstrak untuk tes logika",
+      "imageUrl": "https://picsum.photos/seed/cognitive1/600/400",
+      "imageHint": "abstract geometric"
+    },
+    {
+      "id": "spatial-rotation-1",
+      "description": "Visualisasi rotasi ruang 3D",
+      "imageUrl": "https://picsum.photos/seed/spatial1/600/400",
+      "imageHint": "3d shapes"
+    },
+    {
+      "id": "logic-diagram-1",
+      "description": "Diagram alur logika kognitif",
+      "imageUrl": "https://picsum.photos/seed/logic1/600/400",
+      "imageHint": "logic diagram"
+    }
+  ]
 }

@@ -1,3 +1,4 @@
+
 "use client";
 
 import { Question } from "@/lib/types";
@@ -6,6 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
+import Image from "next/image";
 
 interface QuestionCardProps {
   question: Question;
@@ -21,7 +23,19 @@ export function QuestionCard({ question, value, onChange }: QuestionCardProps) {
           Pertanyaan Kognitif
         </CardTitle>
       </CardHeader>
-      <CardContent className="space-y-8 p-8">
+      <CardContent className="space-y-6 p-8">
+        {question.imageUrl && (
+          <div className="relative w-full aspect-video rounded-xl overflow-hidden border-2 border-muted mb-4 group">
+            <Image 
+              src={question.imageUrl} 
+              alt={question.question}
+              fill
+              className="object-cover transition-transform duration-500 group-hover:scale-105"
+              data-ai-hint={question.imageHint || "cognitive test"}
+            />
+          </div>
+        )}
+        
         <p className="text-2xl font-semibold leading-tight text-foreground/90">
           {question.question}
         </p>
