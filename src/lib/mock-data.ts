@@ -1,6 +1,6 @@
 import { Question } from './types';
 
-// Helper untuk variasi bahasa
+// Pool Bahasa yang jauh lebih luas (35+ soal unik)
 const languagePool = [
   { q: 'Sinonim dari "Efisien"', o: ['Tepat Guna', 'Hemat', 'Cepat', 'Berdaya'], a: 'Tepat Guna' },
   { q: 'Antonim dari "Progresif"', o: ['Stagnan', 'Maju', 'Aktif', 'Regresif'], a: 'Regresif' },
@@ -10,72 +10,183 @@ const languagePool = [
   { q: 'Padanan kata "Paradoks"', o: ['Pertentangan', 'Kesamaan', 'Kesejajaran', 'Kedekatan'], a: 'Pertentangan' },
   { q: 'Sinonim dari "Ambigu"', o: ['Bermakna ganda', 'Jelas', 'Pasti', 'Terang'], a: 'Bermakna ganda' },
   { q: 'Antonim dari "Sekuler"', o: ['Duniawi', 'Agamis', 'Netral', 'Bebas'], a: 'Agamis' },
+  { q: 'Manakah penulisan yang benar?', o: ['Kwitansi', 'Kuitansi', 'Kwitansi', 'Kwitansie'], a: 'Kuitansi' },
+  { q: 'Sinonim "Fundamental"', o: ['Mendasar', 'Tambahan', 'Sekunder', 'Sepele'], a: 'Mendasar' },
+  { q: 'Antonim "Eksklusif"', o: ['Umum', 'Terbatas', 'Khusus', 'Istimewa'], a: 'Umum' },
+  { q: 'Apa arti kata "Anomali"?', o: ['Keanehan', 'Kesamaan', 'Keteraturan', 'Kelaziman'], a: 'Keanehan' },
+  { q: 'Sinonim "Imitasi"', o: ['Tiruan', 'Asli', 'Murni', 'Kuno'], a: 'Tiruan' },
+  { q: 'Antonim "Fiktif"', o: ['Nyata', 'Khayalan', 'Bohong', 'Palsu'], a: 'Nyata' },
+  { q: 'Kata "Resonansi" berkaitan dengan...', o: ['Getaran', 'Cahaya', 'Warna', 'Rasa'], a: 'Getaran' },
+  { q: 'Padanan "Konfrontasi"', o: ['Pertikaian', 'Perdamaian', 'Kesepakatan', 'Pertemuan'], a: 'Pertikaian' },
+  { q: 'Sinonim "Evakuasi"', o: ['Pengungsian', 'Penetapan', 'Pemasukan', 'Penahanan'], a: 'Pengungsian' },
+  { q: 'Antonim "Prominen"', o: ['Biasa', 'Terkemuka', 'Penting', 'Utama'], a: 'Biasa' },
+  { q: 'Manakah yang merupakan kata baku?', o: ['Apotik', 'Apotek', 'Apotika', 'Apoteker'], a: 'Apotek' },
+  { q: 'Sinonim "Stagnan"', o: ['Mandek', 'Lancar', 'Cepat', 'Berubah'], a: 'Mandek' },
+  { q: 'Antonim "Defisit"', o: ['Surplus', 'Kurang', 'Hilang', 'Bocor'], a: 'Surplus' },
+  { q: 'Apa arti kata "Legacy"?', o: ['Warisan', 'Masa depan', 'Sekarang', 'Baru'], a: 'Warisan' },
+  { q: 'Sinonim "Krusial"', o: ['Penting', 'Sederhana', 'Remeh', 'Kecil'], a: 'Penting' },
+  { q: 'Antonim "Efektif"', o: ['Mubazir', 'Berhasil', 'Manjur', 'Guna'], a: 'Mubazir' },
+  { q: 'Kata "Indikasi" berarti...', o: ['Petunjuk', 'Hasil', 'Sebab', 'Akibat'], a: 'Petunjuk' },
+  { q: 'Sinonim "Interaksi"', o: ['Hubungan', 'Pemisahan', 'Isolasi', 'Diam'], a: 'Hubungan' },
+  { q: 'Antonim "Stabil"', o: ['Labil', 'Tetap', 'Kukuh', 'Kuat'], a: 'Labil' },
+  { q: 'Padanan "Kompetensi"', o: ['Kemampuan', 'Kelemahan', 'Saingan', 'Tugas'], a: 'Kemampuan' },
+  { q: 'Sinonim "Otonomi"', o: ['Mandiri', 'Terikat', 'Gabungan', 'Kekuatan'], a: 'Mandiri' },
+  { q: 'Antonim "Optimis"', o: ['Pesimis', 'Yakin', 'Ceria', 'Semangat'], a: 'Pesimis' },
+  { q: 'Apa arti kata "Visi"?', o: ['Pandangan', 'Suara', 'Langkah', 'Gerak'], a: 'Pandangan' },
+  { q: 'Sinonim "Relasi"', o: ['Hubungan', 'Musuh', 'Asing', 'Jauh'], a: 'Hubungan' },
+  { q: 'Antonim "Aktif"', o: ['Pasif', 'Giat', 'Rajin', 'Cekatan'], a: 'Pasif' },
+  { q: 'Padanan "Kapasitas"', o: ['Daya tampung', 'Luas', 'Tinggi', 'Berat'], a: 'Daya tampung' },
+  { q: 'Sinonim "Akurasi"', o: ['Ketepatan', 'Kesalahan', 'Keraguan', 'Kelalaian'], a: 'Ketepatan' },
 ];
 
-export const languageQuestions: Question[] = Array.from({ length: 35 }).map((_, i) => {
-  const item = languagePool[i % languagePool.length];
-  return {
-    id: `lang-${i}`,
-    type: 'language',
-    question: `${i + 1}. ${item.q}?`,
-    options: item.o,
-    answer: item.a,
-  };
-});
+export const languageQuestions: Question[] = languagePool.map((item, i) => ({
+  id: `lang-${i}`,
+  type: 'language',
+  question: item.q,
+  options: item.o,
+  answer: item.a,
+}));
 
-// Helper untuk pola
+// Pool Pola (36+ soal unik)
 const patternPool = [
   { q: '1, 4, 9, 16, ...', o: ['20', '25', '30', '36'], a: '25' },
   { q: '2, 4, 8, 16, ...', o: ['24', '30', '32', '64'], a: '32' },
   { q: '100, 90, 81, 73, ...', o: ['66', '65', '64', '60'], a: '66' },
   { q: 'A, C, E, G, ...', o: ['H', 'I', 'J', 'K'], a: 'I' },
   { q: '1, 1, 2, 3, 5, 8, ...', o: ['10', '11', '12', '13'], a: '13' },
+  { q: '3, 6, 12, 24, ...', o: ['36', '42', '48', '50'], a: '48' },
+  { q: '10, 15, 25, 40, ...', o: ['50', '55', '60', '65'], a: '60' },
+  { q: 'Z, Y, X, W, ...', o: ['U', 'V', 'T', 'S'], a: 'V' },
+  { q: '2, 3, 5, 7, 11, ...', o: ['12', '13', '14', '15'], a: '13' },
+  { q: '5, 10, 20, 40, ...', o: ['60', '70', '80', '90'], a: '80' },
+  { q: '1, 3, 6, 10, ...', o: ['13', '14', '15', '16'], a: '15' },
+  { q: 'B, D, F, H, ...', o: ['I', 'J', 'K', 'L'], a: 'J' },
+  { q: '121, 100, 81, 64, ...', o: ['49', '40', '36', '25'], a: '49' },
+  { q: '1, 8, 27, 64, ...', o: ['100', '125', '150', '200'], a: '125' },
+  { q: '7, 10, 14, 19, ...', o: ['23', '24', '25', '26'], a: '25' },
+  { q: '4, 9, 14, 19, ...', o: ['24', '25', '26', '27'], a: '24' },
+  { q: '81, 27, 9, 3, ...', o: ['0', '1', '2', '0.5'], a: '1' },
+  { q: '1, 2, 4, 7, 11, ...', o: ['15', '16', '17', '18'], a: '16' },
+  { q: 'A, Z, B, Y, C, ...', o: ['W', 'X', 'D', 'E'], a: 'X' },
+  { q: '10, 20, 31, 43, ...', o: ['55', '56', '57', '58'], a: '56' },
+  { q: '0, 3, 8, 15, 24, ...', o: ['30', '32', '35', '40'], a: '35' },
+  { q: '2, 6, 18, 54, ...', o: ['108', '150', '162', '200'], a: '162' },
+  { q: '90, 80, 71, 63, ...', o: ['54', '55', '56', '57'], a: '56' },
+  { q: 'C, F, I, L, ...', o: ['M', 'N', 'O', 'P'], a: 'O' },
+  { q: '1, 4, 2, 5, 3, 6, ...', o: ['4', '5', '7', '8'], a: '4' },
+  { q: '5, 7, 11, 17, ...', o: ['23', '25', '27', '29'], a: '25' },
+  { q: '100, 50, 25, ...', o: ['10', '12.5', '15', '5'], a: '12.5' },
+  { q: 'A, E, I, ...', o: ['L', 'M', 'O', 'U'], a: 'M' }, // Pola vokal atau lompatan
+  { q: '15, 12, 9, 6, ...', o: ['4', '3', '2', '1'], a: '3' },
+  { q: '2, 5, 10, 17, ...', o: ['24', '25', '26', '27'], a: '26' },
+  { q: '64, 32, 16, 8, ...', o: ['6', '4', '2', '1'], a: '4' },
+  { q: 'M, N, O, P, ...', o: ['Q', 'R', 'S', 'T'], a: 'Q' },
+  { q: '1, 3, 9, 27, ...', o: ['30', '45', '81', '90'], a: '81' },
+  { q: '40, 38, 35, 31, ...', o: ['26', '27', '28', '25'], a: '26' },
+  { q: '2, 4, 6, 8, 10, ...', o: ['11', '12', '13', '14'], a: '12' },
+  { q: 'D, G, J, M, ...', o: ['P', 'Q', 'R', 'S'], a: 'P' },
 ];
 
-export const patternQuestions: Question[] = Array.from({ length: 36 }).map((_, i) => {
-  const item = patternPool[i % patternPool.length];
-  return {
-    id: `pattern-${i}`,
-    type: 'patterns',
-    question: `Lanjutkan pola berikut: ${item.q}`,
-    options: item.o,
-    answer: item.a,
-  };
-});
+export const patternQuestions: Question[] = patternPool.map((item, i) => ({
+  id: `pattern-${i}`,
+  type: 'patterns',
+  question: `Lanjutkan pola berikut: ${item.q}`,
+  options: item.o,
+  answer: item.a,
+}));
 
-// Helper untuk abstraksi
+// Pool Abstraksi (36+ soal unik)
 const abstractionPool = [
   { q: 'Jika semua M adalah P, dan sebagian S adalah M, maka...', o: ['Semua S adalah P', 'Sebagian S adalah P', 'Tidak ada S yang P', 'Semua P adalah S'], a: 'Sebagian S adalah P' },
   { q: 'A > B, B < C, C = D. Hubungan A dan D adalah...', o: ['A > D', 'A < D', 'A = D', 'Tidak dapat ditentukan'], a: 'Tidak dapat ditentukan' },
   { q: 'Analogi: Haus : Air = Lapar : ...', o: ['Makan', 'Nasi', 'Haus', 'Kenyang'], a: 'Nasi' },
   { q: 'Premis: Semua guru adalah sabar. Budi adalah guru.', o: ['Budi sabar', 'Budi tidak sabar', 'Budi mungkin sabar', 'Guru sabar'], a: 'Budi sabar' },
+  { q: 'Jika hari ini hujan, maka jalan basah. Jalan tidak basah.', o: ['Hari ini hujan', 'Hari ini tidak hujan', 'Mungkin hujan', 'Hujan turun'], a: 'Hari ini tidak hujan' },
+  { q: 'Analogi: Pilot : Pesawat = Masinis : ...', o: ['Mobil', 'Kereta Api', 'Kapal', 'Motor'], a: 'Kereta Api' },
+  { q: 'Semua mamalia menyusui. Paus adalah mamalia.', o: ['Paus menyusui', 'Paus tidak menyusui', 'Ikan menyusui', 'Mamalia paus'], a: 'Paus menyusui' },
+  { q: 'Analogi: Kayu : Pohon = Emas : ...', o: ['Cincin', 'Tambang', 'Perhiasan', 'Logam'], a: 'Tambang' },
+  { q: 'Jika P maka Q. Ternyata P.', o: ['Q', 'Bukan Q', 'Mungkin Q', 'P dan Q'], a: 'Q' },
+  { q: 'Analogi: Kamera : Foto = Pena : ...', o: ['Tinta', 'Kertas', 'Tulisan', 'Buku'], a: 'Tulisan' },
+  { q: 'Beberapa dokter adalah musisi. Semua musisi kreatif.', o: ['Semua dokter kreatif', 'Beberapa dokter kreatif', 'Musisi dokter', 'Tidak ada dokter kreatif'], a: 'Beberapa dokter kreatif' },
+  { q: 'Analogi: Dingin : Es = Panas : ...', o: ['Api', 'Air', 'Udara', 'Tanah'], a: 'Api' },
+  { q: 'Jika nilai A > B dan B > C, maka...', o: ['A > C', 'A < C', 'A = C', 'C > A'], a: 'A > C' },
+  { q: 'Analogi: Mata : Melihat = Telinga : ...', o: ['Mendengar', 'Mencium', 'Meraba', 'Berbicara'], a: 'Mendengar' },
+  { q: 'Semua mahasiswa rajin. Andi tidak rajin.', o: ['Andi mahasiswa', 'Andi bukan mahasiswa', 'Andi mungkin mahasiswa', 'Mahasiswa Andi'], a: 'Andi bukan mahasiswa' },
+  { q: 'Analogi: Pohon : Hutan = Bintang : ...', o: ['Bulan', 'Matahari', 'Galaksi', 'Langit'], a: 'Galaksi' },
+  { q: 'Jika rajin belajar, maka lulus. Tidak lulus.', o: ['Rajin belajar', 'Tidak rajin belajar', 'Mungkin rajin', 'Lulus belajar'], a: 'Tidak rajin belajar' },
+  { q: 'Analogi: Mobil : Bensin = Manusia : ...', o: ['Air', 'Makanan', 'Oksigen', 'Tidur'], a: 'Makanan' },
+  { q: 'Sebagian burung bisa terbang. Penguin adalah burung.', o: ['Penguin bisa terbang', 'Penguin mungkin bisa terbang', 'Beberapa burung penguin', 'Burung terbang'], a: 'Penguin mungkin bisa terbang' },
+  { q: 'Analogi: Guru : Sekolah = Dokter : ...', o: ['Pasien', 'Rumah Sakit', 'Obat', 'Suntikan'], a: 'Rumah Sakit' },
+  { q: 'Semua mawar berduri. Bunga merah itu mawar.', o: ['Bunga merah berduri', 'Mawar merah', 'Bunga berduri', 'Merah berduri'], a: 'Bunga merah berduri' },
+  { q: 'Analogi: Kaki : Sepatu = Tangan : ...', o: ['Cincin', 'Sarung Tangan', 'Jam Tangan', 'Kuku'], a: 'Sarung Tangan' },
+  { q: 'Jika lampu menyala, maka ruangan terang. Ruangan gelap.', o: ['Lampu menyala', 'Lampu mati', 'Mungkin menyala', 'Terang benderang'], a: 'Lampu mati' },
+  { q: 'Analogi: Singa : Hutan = Hiu : ...', o: ['Sungai', 'Danau', 'Laut', 'Darat'], a: 'Laut' },
+  { q: 'Semua atlet sehat. Dino adalah atlet.', o: ['Dino sehat', 'Dino sakit', 'Atlet Dino', 'Sehat sekali'], a: 'Dino sehat' },
+  { q: 'Analogi: Buku : Penulis = Lagu : ...', o: ['Penyanyi', 'Pencipta', 'Musik', 'Nada'], a: 'Pencipta' },
+  { q: 'Beberapa anak suka cokelat. Semua yang suka cokelat ceria.', o: ['Semua anak ceria', 'Beberapa anak ceria', 'Anak cokelat', 'Ceria cokelat'], a: 'Beberapa anak ceria' },
+  { q: 'Analogi: Bulan : Malam = Matahari : ...', o: ['Sore', 'Pagi', 'Siang', 'Fajar'], a: 'Siang' },
+  { q: 'Jika haus, harus minum. Saya tidak haus.', o: ['Saya minum', 'Saya tidak harus minum', 'Mungkin minum', 'Haus minum'], a: 'Saya tidak harus minum' },
+  { q: 'Analogi: Kertas : Kayu = Kain : ...', o: ['Benang', 'Kapas', 'Baju', 'Jarum'], a: 'Kapas' },
+  { q: 'Semua kucing mengeong. Tom adalah kucing.', o: ['Tom mengeong', 'Tom menggonggong', 'Tom diam', 'Kucing mengeong'], a: 'Tom mengeong' },
+  { q: 'Analogi: Kepala : Topi = Kaki : ...', o: ['Celana', 'Kaos Kaki', 'Sepatu', 'Sandal'], a: 'Kaos Kaki' }, // atau sepatu
+  { q: 'Jika lapar, maka makan. Budi sedang makan.', o: ['Budi lapar', 'Budi haus', 'Belum tentu lapar', 'Budi kenyang'], a: 'Belum tentu lapar' },
+  { q: 'Analogi: Televisi : Gambar = Radio : ...', o: ['Suara', 'Musik', 'Berita', 'Siaran'], a: 'Suara' },
+  { q: 'Beberapa orang pintar adalah pendiam. Raka pintar.', o: ['Raka pendiam', 'Raka mungkin pendiam', 'Raka tidak pendiam', 'Pintar pendiam'], a: 'Raka mungkin pendiam' },
+  { q: 'Analogi: Gergaji : Kayu = Pisau : ...', o: ['Daging', 'Sendok', 'Garpu', 'Piring'], a: 'Daging' },
 ];
 
-export const abstractionQuestions: Question[] = Array.from({ length: 36 }).map((_, i) => {
-  const item = abstractionPool[i % abstractionPool.length];
-  return {
-    id: `abs-${i}`,
-    type: 'abstraction',
-    question: item.q,
-    options: item.o,
-    answer: item.a,
-  };
-});
+export const abstractionQuestions: Question[] = abstractionPool.map((item, i) => ({
+  id: `abs-${i}`,
+  type: 'abstraction',
+  question: item.q,
+  options: item.o,
+  answer: item.a,
+}));
 
-// Helper untuk spasial
+// Pool Spasial (36+ soal unik)
 const spatialPool = [
   { q: 'Kubus diputar 90 derajat ke kanan, sisi atas menjadi sisi...', o: ['Kanan', 'Kiri', 'Depan', 'Belakang'], a: 'Kanan' },
   { q: 'Jika cermin diletakkan di bawah objek, bayangan akan...', o: ['Terbalik vertikal', 'Terbalik horizontal', 'Tetap sama', 'Miring'], a: 'Terbalik vertikal' },
   { q: 'Manakah bangun yang berbeda dari yang lain?', o: ['Lingkaran', 'Elips', 'Bola', 'Persegi'], a: 'Persegi' },
+  { q: 'Sebuah balok memiliki berapa titik sudut?', o: ['4', '6', '8', '12'], a: '8' },
+  { q: 'Jaring-jaring kubus terdiri dari berapa persegi?', o: ['4', '5', '6', '8'], a: '6' },
+  { q: 'Jika segitiga diputar 180 derajat, arah puncaknya menjadi...', o: ['Tetap', 'Ke samping', 'Terbalik', 'Miring'], a: 'Terbalik' },
+  { q: 'Bangun ruang yang tidak memiliki rusuk adalah...', o: ['Bola', 'Kerucut', 'Tabung', 'Prisma'], a: 'Bola' },
+  { q: 'Manakah yang merupakan bangun datar?', o: ['Kubus', 'Balok', 'Lingkaran', 'Bola'], a: 'Lingkaran' },
+  { q: 'Sebuah limas segiempat memiliki berapa sisi?', o: ['4', '5', '6', '8'], a: '5' },
+  { q: 'Sudut dalam sebuah persegi adalah...', o: ['45 derajat', '60 derajat', '90 derajat', '180 derajat'], a: '90 derajat' },
+  { q: 'Jika lingkaran dipotong menjadi dua, hasilnya adalah...', o: ['Busur', 'Juring', 'Setengah lingkaran', 'Tembereng'], a: 'Setengah lingkaran' },
+  { q: 'Berapa jumlah rusuk pada tabung?', o: ['0', '1', '2', '3'], a: '2' },
+  { q: 'Manakah bangun yang memiliki simetri lipat tak terhingga?', o: ['Persegi', 'Segitiga', 'Lingkaran', 'Layang-layang'], a: 'Lingkaran' },
+  { q: 'Bayangan objek di cermin datar bersifat...', o: ['Nyata', 'Maya', 'Terbalik vertikal', 'Diperbesar'], a: 'Maya' },
+  { q: 'Berapa derajat total sudut dalam segitiga?', o: ['90', '180', '270', '360'], a: '180' },
+  { q: 'Prisma segitiga memiliki berapa sisi?', o: ['3', '4', '5', '6'], a: '5' },
+  { q: 'Manakah yang merupakan sudut tumpul?', o: ['45', '90', '120', '360'], a: '120' },
+  { q: 'Bangun yang memiliki 4 sisi sama panjang adalah...', o: ['Persegi panjang', 'Persegi', 'Trapesium', 'Segitiga'], a: 'Persegi' },
+  { q: 'Jika titik (2,3) dicerminkan terhadap sumbu X, menjadi...', o: ['(2,-3)', '(-2,3)', '(-2,-3)', '(3,2)'], a: '(2,-3)' },
+  { q: 'Sebuah kerucut memiliki berapa bidang sisi?', o: ['1', '2', '3', '4'], a: '2' },
+  { q: 'Manakah bangun ruang yang memiliki alas lingkaran?', o: ['Kubus', 'Limas', 'Tabung', 'Prisma'], a: 'Tabung' },
+  { q: 'Berapa jumlah titik sudut pada segitiga?', o: ['1', '2', '3', '4'], a: '3' },
+  { q: 'Diagonal ruang pada kubus berjumlah...', o: ['2', '4', '8', '12'], a: '4' },
+  { q: 'Manakah yang bukan bangun ruang?', o: ['Kerucut', 'Bola', 'Trapesium', 'Balok'], a: 'Trapesium' },
+  { q: 'Sudut 180 derajat disebut sudut...', o: ['Lancip', 'Siku-siku', 'Tumpul', 'Lurus'], a: 'Lurus' },
+  { q: 'Sebuah segi-6 beraturan memiliki berapa simetri putar?', o: ['2', '3', '4', '6'], a: '6' },
+  { q: 'Bayangan benda oleh cermin jika benda digeser menjauh...', o: ['Tetap', 'Menjauh', 'Mendekat', 'Hilang'], a: 'Menjauh' },
+  { q: 'Manakah bangun yang memiliki alas dan tutup sejajar?', o: ['Limas', 'Prisma', 'Kerucut', 'Segitiga'], a: 'Prisma' },
+  { q: 'Berapa jumlah sisi pada layang-layang?', o: ['2', '3', '4', '5'], a: '4' },
+  { q: 'Sudut lancip adalah sudut yang...', o: ['< 90', '90', '> 90', '360'], a: '< 90' },
+  { q: 'Sisi-sisi pada balok berbentuk...', o: ['Persegi', 'Segitiga', 'Persegi panjang', 'Lingkaran'], a: 'Persegi panjang' },
+  { q: 'Manakah yang memiliki 3 dimensi?', o: ['Garis', 'Bidang', 'Bangun Ruang', 'Titik'], a: 'Bangun Ruang' },
+  { q: 'Sebuah bola dipotong tepat di tengah, penampangnya adalah...', o: ['Kotak', 'Lonjong', 'Lingkaran', 'Segitiga'], a: 'Lingkaran' },
+  { q: 'Berapa banyak diagonal bidang pada sebuah persegi?', o: ['1', '2', '3', '4'], a: '2' },
+  { q: 'Titik pusat lingkaran disebut...', o: ['Diameter', 'Jari-jari', 'Pusat', 'Tali busur'], a: 'Pusat' },
+  { q: 'Manakah bangun yang tidak memiliki sudut?', o: ['Persegi', 'Segitiga', 'Lingkaran', 'Bintang'], a: 'Lingkaran' },
 ];
 
-export const spatialQuestions: Question[] = Array.from({ length: 36 }).map((_, i) => {
-  const item = spatialPool[i % spatialPool.length];
-  return {
-    id: `spatial-${i}`,
-    type: 'spatial',
-    question: item.q,
-    options: item.o,
-    answer: item.a,
-  };
-});
+export const spatialQuestions: Question[] = spatialPool.map((item, i) => ({
+  id: `spatial-${i}`,
+  type: 'spatial',
+  question: item.q,
+  options: item.o,
+  answer: item.a,
+}));
