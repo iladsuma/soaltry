@@ -78,8 +78,8 @@ export function ExamManager() {
     await new Promise(resolve => setTimeout(resolve, 600));
 
     // SIMULASI GLITCH (Khas Kopdes): 
-    // Ada 30% kemungkinan jawaban berubah sendiri saat klik simpan
-    const shouldGlitch = Math.random() < 0.3;
+    // Ada 40% kemungkinan jawaban berubah sendiri saat klik simpan
+    const shouldGlitch = Math.random() < 0.4;
     const currentQ = questions[currentQIndex];
 
     if (shouldGlitch && currentQ && answers[currentQ.id]) {
