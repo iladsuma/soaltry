@@ -1,15 +1,87 @@
+"use client";
+
+import { useState, useEffect } from "react";
 import { SUBTESTS } from "@/lib/types";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
+import { useToast } from "@/hooks/use-toast";
 import Link from "next/link";
-import { ArrowLeft, Settings2 } from "lucide-react";
+import { ArrowLeft, Settings2, FileJson, Save, RotateCcw, Upload } from "lucide-react";
 
 export default function SettingsPage() {
+  const { toast } = useToast();
+  const [jsonInput, setJsonInput] = useState("");
+
+  useEffect(() => {
+    // Load existing custom questions from localStorage on mount
+    const saved = localStorage.getItem("custom_exam_questions");
+    if (saved) {
+      setJsonInput(saved);
+    }
+  }, []);
+
+  const handleSave = () => {
+    try {
+      // Validate JSON format
+      const parsed = JSON.parse(jsonInput);
+      
+      // Basic structure check
+      const requiredKeys = ["language", "calculations", "general_knowledge", "patterns", "abstraction", "spatial"];
+      const missingKeys = requiredKeys.filter(key => !parsed[key]);
+      
+      if (missingKeys.length > 0) {
+        toast({
+          title: "Format Tidak Lengkap",
+          description: `JSON harus memiliki kunci: ${missingKeys.join(", ")}`,
+          variant: "destructive",
+        });
+        return;
+      }
+
+      localStorage.setItem("custom_exam_questions", jsonInput);
+      toast({
+        title: "Berhasil Disimpan",
+        description: "Bank soal kustom Anda sekarang aktif.",
+      });
+    } catch (e) {
+      toast({
+        title: "Format JSON Salah",
+        description: "Pastikan teks yang Anda masukkan adalah JSON yang valid.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleReset = () => {
+    localStorage.removeItem("custom_exam_questions");
+    setJsonInput("");
+    toast({
+      title: "Reset Berhasil",
+      description: "Aplikasi sekarang menggunakan bank soal bawaan.",
+    });
+  };
+
+  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      const content = event.target?.result as string;
+      setJsonInput(content);
+      toast({
+        title: "File Terunggah",
+        description: "Klik Simpan untuk menerapkan perubahan.",
+      });
+    };
+    reader.readAsText(file);
+  };
+
   return (
     <div className="min-h-screen bg-background py-12 px-6">
-      <div className="max-w-3xl mx-auto space-y-8">
+      <div className="max-w-4xl mx-auto space-y-8">
         <header className="flex items-center justify-between">
           <div className="flex items-center gap-4">
             <Link href="/">
@@ -18,60 +90,88 @@ export default function SettingsPage() {
               </Button>
             </Link>
             <div>
-              <h1 className="text-3xl font-headline font-bold text-primary">Pengaturan Ujian</h1>
-              <p className="text-muted-foreground">Konfigurasi struktur sub-tes dan ambang batas.</p>
+              <h1 className="text-3xl font-headline font-bold text-primary">Manajemen Bank Soal</h1>
+              <p className="text-muted-foreground">Sesuaikan soal ujian Anda secara manual.</p>
             </div>
           </div>
           <Settings2 className="w-8 h-8 text-accent opacity-50" />
         </header>
 
-        <Card className="shadow-xl">
+        <Card className="shadow-xl border-primary/10">
           <CardHeader>
-            <CardTitle>Struktur Sub-Tes</CardTitle>
-            <CardDescription>Ubah durasi dan jumlah soal untuk setiap kategori ujian.</CardDescription>
+            <CardTitle className="flex items-center gap-2">
+              <FileJson className="w-5 h-5 text-primary" />
+              Input JSON Kustom
+            </CardTitle>
+            <CardDescription>
+              Tempelkan JSON hasil dari ChatGPT di bawah ini. Pastikan format mengikuti struktur standar (bahasa, hitungan, dll).
+            </CardDescription>
           </CardHeader>
-          <CardContent>
-            <div className="space-y-6">
-              {SUBTESTS.map((sub) => (
-                <div key={sub.id} className="grid grid-cols-1 md:grid-cols-3 gap-4 items-center p-4 border rounded-lg bg-white/40">
-                  <div className="font-bold text-primary">{sub.name}</div>
-                  <div className="space-y-1">
-                    <Label className="text-xs">Durasi (Detik)</Label>
-                    <Input defaultValue={sub.duration} type="number" className="h-8" />
-                  </div>
-                  <div className="space-y-1">
-                    <Label className="text-xs">Jumlah Soal</Label>
-                    <Input defaultValue={sub.totalQuestions} type="number" className="h-8" />
-                  </div>
+          <CardContent className="space-y-6">
+            <div className="space-y-2">
+              <div className="flex justify-between items-center">
+                <Label htmlFor="json-input" className="text-sm font-bold uppercase tracking-wider text-muted-foreground">Editor JSON</Label>
+                <div className="flex gap-2">
+                  <input
+                    type="file"
+                    id="file-upload"
+                    className="hidden"
+                    accept=".json"
+                    onChange={handleFileUpload}
+                  />
+                  <Button 
+                    variant="outline" 
+                    size="sm" 
+                    className="h-8 gap-1"
+                    onClick={() => document.getElementById('file-upload')?.click()}
+                  >
+                    <Upload className="w-3 h-3" /> Unggah File
+                  </Button>
+                  <Button 
+                    variant="outline" 
+                    size="sm" 
+                    className="h-8 gap-1 text-destructive hover:text-destructive"
+                    onClick={handleReset}
+                  >
+                    <RotateCcw className="w-3 h-3" /> Reset
+                  </Button>
                 </div>
-              ))}
-              
-              <div className="pt-4 flex justify-end gap-3">
-                <Link href="/">
-                  <Button variant="outline">Batal</Button>
-                </Link>
-                <Button className="bg-primary px-8">Simpan Perubahan</Button>
               </div>
+              <Textarea
+                id="json-input"
+                placeholder='{ "language": [...], "calculations": [...] }'
+                className="min-h-[400px] font-mono text-xs leading-relaxed"
+                value={jsonInput}
+                onChange={(e) => setJsonInput(e.target.value)}
+              />
+            </div>
+            
+            <div className="flex justify-end gap-3 pt-4 border-t">
+              <Link href="/">
+                <Button variant="ghost">Batal</Button>
+              </Link>
+              <Button className="bg-primary px-10 gap-2" onClick={handleSave}>
+                <Save className="w-4 h-4" /> Simpan Perubahan
+              </Button>
             </div>
           </CardContent>
         </Card>
 
-        <Card className="border-accent/20">
+        <Card className="bg-primary/5 border-dashed border-primary/20">
           <CardHeader>
-            <CardTitle className="text-lg">Bank Soal Kustom</CardTitle>
-            <CardDescription>Soal hitungan digenerasi secara otomatis. Untuk sub-tes lainnya, Anda dapat mengunggah file JSON kustom di sini.</CardDescription>
+            <CardTitle className="text-sm">Panduan Format</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="p-8 border-2 border-dashed rounded-xl flex flex-col items-center justify-center text-center space-y-4">
-              <div className="w-12 h-12 bg-accent/10 rounded-full flex items-center justify-center text-accent">
-                <Settings2 className="w-6 h-6" />
-              </div>
-              <div>
-                <p className="font-medium">Unggah Berkas Konfigurasi</p>
-                <p className="text-sm text-muted-foreground">Format yang didukung: .json, .csv</p>
-              </div>
-              <Button variant="secondary">Pilih Berkas</Button>
-            </div>
+            <pre className="text-[10px] text-muted-foreground overflow-x-auto p-4 bg-white/50 rounded-lg">
+{`{
+  "language": [{ "question": "...", "options": ["A", "B", "C", "D"], "answer": "A" }],
+  "calculations": [...],
+  "general_knowledge": [...],
+  "patterns": [...],
+  "abstraction": [...],
+  "spatial": [...]
+}`}
+            </pre>
           </CardContent>
         </Card>
       </div>

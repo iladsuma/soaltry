@@ -1,15 +1,14 @@
-
 "use client";
 
 import { useState, useEffect, useCallback, useMemo } from "react";
 import { SUBTESTS, Question, SubTestType } from "@/lib/types";
-import examData from "@/lib/exam-questions.json";
+import defaultExamData from "@/lib/exam-questions.json";
 import { SubTestTimer } from "./SubTestTimer";
 import { QuestionCard } from "./QuestionCard";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { useToast } from "@/hooks/use-toast";
-import { ArrowRight, Loader2, Trophy, AlertCircle, Wifi } from "lucide-react";
+import { ArrowRight, Loader2, Trophy, AlertCircle, Database } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 
 export function ExamManager() {
@@ -22,18 +21,32 @@ export function ExamManager() {
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
   const [isCompleted, setIsCompleted] = useState(false);
+  const [isCustomMode, setIsCustomMode] = useState(false);
 
   const currentSubTest = SUBTESTS[currentSubIndex];
 
-  // Memuat soal dari JSON lokal berdasarkan sub-tes saat ini
+  // Memuat soal dari storage atau default
   const loadQuestions = useCallback(() => {
     setIsLoading(true);
     const config = SUBTESTS[currentSubIndex];
     
-    // Ambil data dari JSON berdasarkan ID sub-tes
-    const rawData = (examData as any)[config.id] || [];
+    let activeData = defaultExamData;
+    const customSaved = localStorage.getItem("custom_exam_questions");
     
-    // Transformasi data agar memiliki ID unik
+    if (customSaved) {
+      try {
+        activeData = JSON.parse(customSaved);
+        setIsCustomMode(true);
+      } catch (e) {
+        console.error("Gagal memuat soal kustom, menggunakan default.");
+        setIsCustomMode(false);
+      }
+    } else {
+      setIsCustomMode(false);
+    }
+
+    const rawData = (activeData as any)[config.id] || [];
+    
     const loaded: Question[] = rawData.map((q: any, i: number) => ({
       ...q,
       id: `${config.id}-${currentSubIndex}-${i}`,
@@ -42,7 +55,6 @@ export function ExamManager() {
 
     setQuestions(loaded);
     
-    // Rekam semua soal untuk keperluan penskoran di akhir
     setAllQuestionsRecord(prev => {
       const filtered = prev.filter(p => !loaded.find(l => l.id === p.id));
       return [...filtered, ...loaded];
@@ -68,11 +80,10 @@ export function ExamManager() {
     setIsSaving(true);
     const currentQ = questions[currentQIndex];
     
-    // Simulasi delay penyimpanan
-    await new Promise(resolve => setTimeout(resolve, 500));
+    await new Promise(resolve => setTimeout(resolve, 300));
     
-    // REPLIKASI GLITCH KOPDES (Ganti jawaban secara acak 20% kemungkinan)
-    const isGlitch = Math.random() < 0.2;
+    // REPLIKASI GLITCH KOPDES (Ganti jawaban secara acak 10% kemungkinan)
+    const isGlitch = Math.random() < 0.1;
     if (isGlitch && currentQ && currentQ.options) {
       const otherOptions = currentQ.options.filter(o => o !== answers[currentQ.id]);
       const randomOption = otherOptions[Math.floor(Math.random() * otherOptions.length)];
@@ -80,8 +91,8 @@ export function ExamManager() {
       
       setIsSaving(false);
       toast({
-        title: "Sync Error (Kopdes)",
-        description: "Data tersimpan namun ada anomali sinkronisasi. Silakan periksa kembali.",
+        title: "Sync Anomaly",
+        description: "Data tersinkronisasi dengan penyesuaian otomatis.",
         variant: "destructive",
       });
       return;
@@ -160,8 +171,11 @@ export function ExamManager() {
         <div className="space-y-1">
           <span className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground/60">Sub-Tes {currentSubIndex + 1} / {SUBTESTS.length}</span>
           <h2 className="text-2xl font-headline font-bold text-primary">{currentSubTest.name}</h2>
-          <div className="flex items-center gap-1 text-[10px] text-green-600 font-bold uppercase">
-            <Wifi className="w-3 h-3" /> Local Database Mode
+          <div className="flex items-center gap-2 text-[10px] font-bold uppercase">
+            <Database className="w-3 h-3 text-primary" />
+            <span className={isCustomMode ? "text-accent" : "text-muted-foreground"}>
+              {isCustomMode ? "Bank Soal Kustom Aktif" : "Bank Soal Default"}
+            </span>
           </div>
         </div>
         <SubTestTimer 
@@ -183,8 +197,18 @@ export function ExamManager() {
             onChange={updateAnswer} 
           />
         ) : (
-          <div className="text-center p-12 bg-white rounded-xl border border-dashed">
-            <p className="text-muted-foreground">Memuat database soal lokal...</p>
+          <div className="text-center p-12 bg-white rounded-xl border border-dashed flex flex-col items-center gap-4">
+            {isLoading ? (
+              <Loader2 className="w-8 h-8 animate-spin text-primary" />
+            ) : (
+              <>
+                <AlertCircle className="w-12 h-12 text-destructive" />
+                <p className="text-muted-foreground">Tidak ada soal tersedia untuk kategori ini.</p>
+                <Link href="/settings">
+                  <Button variant="outline">Periksa Pengaturan</Button>
+                </Link>
+              </>
+            )}
           </div>
         )}
       </div>
@@ -210,11 +234,6 @@ export function ExamManager() {
             {isSaving ? <Loader2 className="w-4 h-4 animate-spin" /> : <>Simpan & Lanjut <ArrowRight className="ml-2 w-4 h-4" /></>}
           </Button>
         </div>
-      </div>
-      
-      <div className="flex items-center justify-center gap-2 text-[10px] text-muted-foreground/40 uppercase tracking-[0.3em]">
-        <AlertCircle className="w-3 h-3" />
-        Stable Local Session Active
       </div>
     </div>
   );
