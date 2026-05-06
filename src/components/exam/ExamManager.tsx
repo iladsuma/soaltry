@@ -2,9 +2,10 @@
 
 import { useState, useEffect, useCallback, useMemo } from "react";
 import { SUBTESTS, Question } from "@/lib/types";
-import { languageQuestions, patternQuestions, abstractionQuestions, spatialQuestions } from "@/lib/mock-data";
+import { patternQuestions, abstractionQuestions, spatialQuestions } from "@/lib/mock-data";
 import { generateCalculationProblems } from "@/ai/flows/generate-calculation-problems";
 import { generateGeneralKnowledgeQuestions } from "@/ai/flows/generate-general-knowledge-questions";
+import { generateLanguageQuestions } from "@/ai/flows/generate-language-questions";
 import { SubTestTimer } from "./SubTestTimer";
 import { QuestionCard } from "./QuestionCard";
 import { Button } from "@/components/ui/button";
@@ -34,15 +35,28 @@ export function ExamManager() {
     const config = SUBTESTS[currentSubIndex];
 
     try {
-      if (config.id === 'calculations') {
-        // Batching: Request in chunks of 15 for stability
-        const batchSize = 15;
+      if (config.id === 'language') {
+        const batchSize = 12;
+        const numBatches = Math.ceil(config.totalQuestions / batchSize);
+        const batchPromises = Array.from({ length: numBatches }).map((_, i) => {
+          const count = Math.min(batchSize, config.totalQuestions - i * batchSize);
+          return generateLanguageQuestions({ count });
+        });
+        const results = await Promise.all(batchPromises);
+        loaded = results.flatMap(r => r.questions).map((q, i) => ({
+          id: `lang-${currentSubIndex}-${i}`,
+          type: 'language',
+          question: q.question,
+          options: q.options,
+          answer: q.answer,
+        }));
+      } else if (config.id === 'calculations') {
+        const batchSize = 12;
         const numBatches = Math.ceil(config.totalQuestions / batchSize);
         const batchPromises = Array.from({ length: numBatches }).map((_, i) => {
           const count = Math.min(batchSize, config.totalQuestions - i * batchSize);
           return generateCalculationProblems({ numProblems: count });
         });
-        
         const results = await Promise.all(batchPromises);
         loaded = results.flatMap(r => r.problems).map((p, i) => ({
           id: `calc-${currentSubIndex}-${i}`,
@@ -52,17 +66,15 @@ export function ExamManager() {
           answer: p.answer,
         }));
       } else if (config.id === 'general_knowledge') {
-        // Batching: Request in chunks of 10 for stability
         const batchSize = 10;
         const numBatches = Math.ceil(config.totalQuestions / batchSize);
         const batchPromises = Array.from({ length: numBatches }).map((_, i) => {
           const count = Math.min(batchSize, config.totalQuestions - i * batchSize);
           return generateGeneralKnowledgeQuestions({ 
-            topics: ['Sejarah', 'Geografi', 'Sains', 'Budaya', 'Seni', 'Politik'],
+            topics: ['Sejarah', 'Geografi', 'Sains', 'Budaya', 'Politik', 'Teknologi'],
             count: count 
           });
         });
-
         const results = await Promise.all(batchPromises);
         loaded = results.flatMap(r => r.questions).map((q, i) => ({
           id: `gk-${currentSubIndex}-${i}`,
@@ -73,7 +85,6 @@ export function ExamManager() {
         }));
       } else {
         const mockMap: Record<string, Question[]> = {
-          language: languageQuestions,
           patterns: patternQuestions,
           abstraction: abstractionQuestions,
           spatial: spatialQuestions
@@ -93,7 +104,7 @@ export function ExamManager() {
       setIsLoading(false);
       toast({ 
         title: "Gagal memuat soal AI", 
-        description: err.message || "Cek API Key atau kuota. Klik Refresh untuk coba lagi.", 
+        description: err.message || "Cek API Key atau kuota.", 
         variant: "destructive" 
       });
     }
@@ -116,7 +127,6 @@ export function ExamManager() {
     setIsSaving(true);
     const currentQ = questions[currentQIndex];
     
-    // Simulasi delay simpan
     await new Promise(resolve => setTimeout(resolve, 800));
     
     // REPLIKASI GLITCH KOPDES (40% probabilitas)
@@ -124,7 +134,6 @@ export function ExamManager() {
 
     if (isGlitch) {
       if (currentQ && currentQ.options) {
-        // Tepat sebelum error, kita ganti jawabannya secara visual agar user kaget (replikasi Kopdes)
         const otherOptions = currentQ.options.filter(o => o !== answers[currentQ.id]);
         const randomOption = otherOptions[Math.floor(Math.random() * otherOptions.length)];
         setAnswers(prev => ({ ...prev, [currentQ.id]: randomOption }));
