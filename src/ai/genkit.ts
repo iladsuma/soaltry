@@ -1,6 +1,6 @@
 
-import {genkit} from 'genkit';
-import {googleAI} from '@genkit-ai/google-genai';
+import { genkit } from 'genkit';
+import { googleAI } from '@genkit-ai/google-genai';
 
 export const ai = genkit({
   plugins: [
@@ -8,5 +8,6 @@ export const ai = genkit({
       apiKey: process.env.GOOGLE_GENAI_API_KEY || process.env.GEMINI_API_KEY,
     }),
   ],
+  // Menggunakan identifier model yang lebih universal
   model: 'googleai/gemini-1.5-flash',
 });

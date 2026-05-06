@@ -1,7 +1,7 @@
 
 'use server';
 /**
- * @fileOverview A Genkit flow for generating Indonesian language questions (Sinonim, Antonim, Analogi).
+ * @fileOverview A Genkit flow for generating Indonesian language questions.
  */
 
 import { ai } from '@/ai/genkit';
@@ -32,21 +32,14 @@ const generateLanguageQuestionsPrompt = ai.definePrompt({
   name: 'generateLanguageQuestionsPrompt',
   input: { schema: GenerateLanguageQuestionsInputSchema },
   output: { schema: GenerateLanguageQuestionsOutputSchema },
-  prompt: `You are an expert Indonesian linguist creating questions for a professional cognitive exam.
-  Generate exactly {{count}} unique Indonesian language questions.
-  
-  Question categories to mix:
-  - Sinonim (Persamaan Kata)
-  - Antonim (Lawan Kata)
-  - Analogi Kata (e.g., "Gergaji : Kayu = Pisau : ...")
-  - Padanan Kata (Definisi/Arti kata baku)
+  prompt: `You are an expert Indonesian linguist.
+  Generate exactly {{count}} unique Indonesian language questions (Sinonim, Antonim, Analogi).
   
   Rules:
   1. Each question MUST be in Indonesian.
   2. Each question MUST have exactly 4 options.
   3. The "answer" MUST be exactly one of the options.
-  4. Use professional and academic vocabulary (Kata Baku).
-  5. Output ONLY valid JSON.`,
+  4. Output ONLY valid JSON.`,
 });
 
 const generateLanguageQuestionsFlow = ai.defineFlow(
@@ -58,14 +51,11 @@ const generateLanguageQuestionsFlow = ai.defineFlow(
   async (input) => {
     try {
       const { output } = await generateLanguageQuestionsPrompt(input);
-      if (!output || !output.questions || output.questions.length === 0) {
-        throw new Error('AI returned an empty list of language questions.');
-      }
+      if (!output) throw new Error('AI returned empty output');
       return output;
     } catch (error: any) {
-      console.error('Error in generateLanguageQuestionsFlow details:', error);
-      // Fallback message for user
-      throw new Error(`Gagal menghasilkan soal bahasa: ${error.message || 'Cek koneksi API'}`);
+      console.error('Error in generateLanguageQuestionsFlow:', error);
+      throw new Error(`Gagal: ${error.message}`);
     }
   }
 );

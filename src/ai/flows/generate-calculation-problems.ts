@@ -8,7 +8,7 @@ import { ai } from '@/ai/genkit';
 import { z } from 'genkit';
 
 const GenerateCalculationProblemsInputSchema = z.object({
-  numProblems: z.number().int().min(1).max(20).describe('The number of calculation problems to generate (max 20 per batch for stability).'),
+  numProblems: z.number().int().min(1).max(20).describe('The number of calculation problems to generate.'),
 });
 export type GenerateCalculationProblemsInput = z.infer<typeof GenerateCalculationProblemsInputSchema>;
 
@@ -32,18 +32,12 @@ const generateCalculationProblemsPrompt = ai.definePrompt({
   name: 'generateCalculationProblemsPrompt',
   input: { schema: GenerateCalculationProblemsInputSchema },
   output: { schema: GenerateCalculationProblemsOutputSchema },
-  prompt: `You are a high-precision math problem generator for a cognitive exam. 
+  prompt: `You are a high-precision math problem generator. 
   Create exactly {{numProblems}} unique calculation problems.
   Each problem MUST be multiple choice with exactly 4 options.
   The "answer" field MUST match one of the options exactly.
   
-  Types of problems to include:
-  - Basic arithmetic (addition, subtraction, multiplication, division with 2-3 digits)
-  - Percentages and fractions
-  - Simple algebraic word problems
-  
-  Make questions challenging for adults but solvable within 20 seconds without a calculator.
-  Output ONLY valid JSON following the schema.`,
+  Output ONLY valid JSON.`,
 });
 
 const generateCalculationProblemsFlow = ai.defineFlow(
@@ -55,13 +49,11 @@ const generateCalculationProblemsFlow = ai.defineFlow(
   async (input) => {
     try {
       const { output } = await generateCalculationProblemsPrompt(input);
-      if (!output || !output.problems || output.problems.length === 0) {
-        throw new Error('AI returned an empty list of problems.');
-      }
+      if (!output) throw new Error('AI returned empty output');
       return output;
     } catch (error: any) {
       console.error('Error in generateCalculationProblemsFlow:', error);
-      throw new Error(`Gagal menghasilkan soal hitungan: ${error.message || 'Cek koneksi/kuota'}`);
+      throw new Error(`Gagal: ${error.message}`);
     }
   }
 );
