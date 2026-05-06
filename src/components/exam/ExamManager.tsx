@@ -9,7 +9,7 @@ import { QuestionCard } from "./QuestionCard";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { useToast } from "@/hooks/use-toast";
-import { ArrowRight, Loader2, Trophy, AlertCircle, Database } from "lucide-react";
+import { ArrowRight, Loader2, Trophy, AlertCircle, Database, RefreshCcw } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import Link from "next/link";
 
@@ -25,7 +25,6 @@ export function ExamManager() {
   const [isCompleted, setIsCompleted] = useState(false);
   const [isCustomMode, setIsCustomMode] = useState(false);
 
-  // 1. Load the entire bank once on mount
   useEffect(() => {
     setIsLoading(true);
     const customSaved = localStorage.getItem("custom_exam_questions");
@@ -36,7 +35,6 @@ export function ExamManager() {
         activeData = JSON.parse(customSaved);
         setIsCustomMode(true);
       } catch (e) {
-        console.error("Failed to parse custom JSON, falling back to default.");
         setIsCustomMode(false);
       }
     }
@@ -45,7 +43,6 @@ export function ExamManager() {
     setIsLoading(false);
   }, []);
 
-  // 2. Set questions for the current sub-test when bank or index changes
   useEffect(() => {
     if (Object.keys(fullBank).length === 0) return;
 
@@ -76,7 +73,32 @@ export function ExamManager() {
 
   const handleSaveAndContinue = async () => {
     setIsSaving(true);
-    await new Promise(resolve => setTimeout(resolve, 100));
+    
+    // Simulasi Delay Sinkronisasi
+    await new Promise(resolve => setTimeout(resolve, 600));
+
+    // SIMULASI GLITCH (Khas Kopdes): 
+    // Ada 30% kemungkinan jawaban berubah sendiri saat klik simpan
+    const shouldGlitch = Math.random() < 0.3;
+    const currentQ = questions[currentQIndex];
+
+    if (shouldGlitch && currentQ && answers[currentQ.id]) {
+      // Ubah jawaban ke opsi lain secara acak
+      const currentAnswer = answers[currentQ.id];
+      const otherOptions = currentQ.options.filter(o => o !== currentAnswer);
+      const randomFakeAnswer = otherOptions[Math.floor(Math.random() * otherOptions.length)];
+      
+      setAnswers(prev => ({ ...prev, [currentQ.id]: randomFakeAnswer }));
+      
+      setIsSaving(false);
+      toast({
+        variant: "destructive",
+        title: "Sinkronisasi Gagal",
+        description: "Terjadi gangguan pada database (Error 503). Jawaban terdeteksi berubah, silakan periksa dan simpan ulang.",
+      });
+      return; // Berhenti di sini, tidak lanjut ke soal berikutnya
+    }
+
     setIsSaving(false);
     
     if (currentQIndex < questions.length - 1) {
@@ -192,9 +214,7 @@ export function ExamManager() {
               <>
                 <AlertCircle className="w-12 h-12 text-destructive" />
                 <p className="text-muted-foreground">
-                  Data soal untuk <b>{currentSubTest.name}</b> tidak ditemukan dalam JSON.
-                  <br />
-                  <span className="text-[10px] opacity-70">Pastikan kunci JSON adalah "{currentSubTest.id}"</span>
+                  Data soal untuk <b>{currentSubTest.name}</b> tidak ditemukan.
                 </p>
                 <Link href="/settings">
                   <Button variant="outline">Cek Pengaturan</Button>
