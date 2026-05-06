@@ -1,8 +1,9 @@
+
 "use client";
 
 import { useState, useEffect, useCallback, useMemo } from "react";
 import { SUBTESTS, Question } from "@/lib/types";
-import { patternQuestions, abstractionQuestions, spatialQuestions } from "@/lib/mock-data";
+import { patternQuestions, abstractionQuestions, spatialQuestions, languageQuestions } from "@/lib/mock-data";
 import { generateCalculationProblems } from "@/ai/flows/generate-calculation-problems";
 import { generateGeneralKnowledgeQuestions } from "@/ai/flows/generate-general-knowledge-questions";
 import { generateLanguageQuestions } from "@/ai/flows/generate-language-questions";
@@ -11,7 +12,7 @@ import { QuestionCard } from "./QuestionCard";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { useToast } from "@/hooks/use-toast";
-import { ArrowRight, Loader2, Trophy, AlertCircle, RefreshCcw } from "lucide-react";
+import { ArrowRight, Loader2, Trophy, AlertCircle, RefreshCcw, WifiOff } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Card, CardContent } from "@/components/ui/card";
 
@@ -26,63 +27,112 @@ export function ExamManager() {
   const [isSaving, setIsSaving] = useState(false);
   const [isCompleted, setIsCompleted] = useState(false);
   const [retryCount, setRetryCount] = useState(0);
+  const [isUsingFallback, setIsUsingFallback] = useState(false);
 
   const currentSubTest = SUBTESTS[currentSubIndex];
 
   const fetchQuestions = useCallback(async () => {
     setIsLoading(true);
+    setIsUsingFallback(false);
     let loaded: Question[] = [];
     const config = SUBTESTS[currentSubIndex];
 
     try {
       if (config.id === 'language') {
-        const batchSize = 12;
-        const numBatches = Math.ceil(config.totalQuestions / batchSize);
-        const batchPromises = Array.from({ length: numBatches }).map((_, i) => {
-          const count = Math.min(batchSize, config.totalQuestions - i * batchSize);
-          return generateLanguageQuestions({ count });
-        });
-        const results = await Promise.all(batchPromises);
-        loaded = results.flatMap(r => r.questions).map((q, i) => ({
-          id: `lang-${currentSubIndex}-${i}`,
-          type: 'language',
-          question: q.question,
-          options: q.options,
-          answer: q.answer,
-        }));
+        try {
+          const batchSize = 10;
+          const numBatches = Math.ceil(config.totalQuestions / batchSize);
+          const allBatchQuestions = [];
+          
+          for (let i = 0; i < numBatches; i++) {
+            const count = Math.min(batchSize, config.totalQuestions - i * batchSize);
+            const result = await generateLanguageQuestions({ count });
+            allBatchQuestions.push(...result.questions);
+            // Small delay to prevent rate limit
+            await new Promise(resolve => setTimeout(resolve, 500));
+          }
+          
+          loaded = allBatchQuestions.map((q, i) => ({
+            id: `lang-${currentSubIndex}-${i}`,
+            type: 'language',
+            question: q.question,
+            options: q.options,
+            answer: q.answer,
+          }));
+        } catch (aiError) {
+          console.warn("AI Language failed, using fallback", aiError);
+          setIsUsingFallback(true);
+          loaded = languageQuestions.slice(0, config.totalQuestions).map((q, i) => ({
+            ...q,
+            id: `lang-fallback-${currentSubIndex}-${i}`
+          }));
+        }
       } else if (config.id === 'calculations') {
-        const batchSize = 12;
-        const numBatches = Math.ceil(config.totalQuestions / batchSize);
-        const batchPromises = Array.from({ length: numBatches }).map((_, i) => {
-          const count = Math.min(batchSize, config.totalQuestions - i * batchSize);
-          return generateCalculationProblems({ numProblems: count });
-        });
-        const results = await Promise.all(batchPromises);
-        loaded = results.flatMap(r => r.problems).map((p, i) => ({
-          id: `calc-${currentSubIndex}-${i}`,
-          type: 'calculations',
-          question: p.question,
-          options: p.options,
-          answer: p.answer,
-        }));
+        try {
+          const batchSize = 10;
+          const numBatches = Math.ceil(config.totalQuestions / batchSize);
+          const allBatchProblems = [];
+
+          for (let i = 0; i < numBatches; i++) {
+            const count = Math.min(batchSize, config.totalQuestions - i * batchSize);
+            const result = await generateCalculationProblems({ numProblems: count });
+            allBatchProblems.push(...result.problems);
+            await new Promise(resolve => setTimeout(resolve, 500));
+          }
+
+          loaded = allBatchProblems.map((p, i) => ({
+            id: `calc-${currentSubIndex}-${i}`,
+            type: 'calculations',
+            question: p.question,
+            options: p.options,
+            answer: p.answer,
+          }));
+        } catch (aiError) {
+          console.warn("AI Calculations failed, using fallback", aiError);
+          setIsUsingFallback(true);
+          // Simple local calculation mock for emergency
+          loaded = Array.from({ length: config.totalQuestions }).map((_, i) => ({
+            id: `calc-fallback-${i}`,
+            type: 'calculations',
+            question: `Berapakah ${10 + i} + ${20 + i}?`,
+            options: [String(30 + 2*i), String(30 + i), String(40 + i), String(25 + i)],
+            answer: String(30 + 2*i),
+          }));
+        }
       } else if (config.id === 'general_knowledge') {
-        const batchSize = 10;
-        const numBatches = Math.ceil(config.totalQuestions / batchSize);
-        const batchPromises = Array.from({ length: numBatches }).map((_, i) => {
-          const count = Math.min(batchSize, config.totalQuestions - i * batchSize);
-          return generateGeneralKnowledgeQuestions({ 
-            topics: ['Sejarah', 'Geografi', 'Sains', 'Budaya', 'Politik', 'Teknologi'],
-            count: count 
-          });
-        });
-        const results = await Promise.all(batchPromises);
-        loaded = results.flatMap(r => r.questions).map((q, i) => ({
-          id: `gk-${currentSubIndex}-${i}`,
-          type: 'general_knowledge',
-          question: q.question,
-          options: q.options,
-          answer: q.answer,
-        }));
+        try {
+          const batchSize = 10;
+          const numBatches = Math.ceil(config.totalQuestions / batchSize);
+          const allBatchQuestions = [];
+
+          for (let i = 0; i < numBatches; i++) {
+            const count = Math.min(batchSize, config.totalQuestions - i * batchSize);
+            const result = await generateGeneralKnowledgeQuestions({ 
+              topics: ['Sejarah Indonesia', 'Geografi', 'Sains Dasar', 'Budaya Pop', 'Politik'],
+              count: count 
+            });
+            allBatchQuestions.push(...result.questions);
+            await new Promise(resolve => setTimeout(resolve, 500));
+          }
+
+          loaded = allBatchQuestions.map((q, i) => ({
+            id: `gk-${currentSubIndex}-${i}`,
+            type: 'general_knowledge',
+            question: q.question,
+            options: q.options,
+            answer: q.answer,
+          }));
+        } catch (aiError) {
+          console.warn("AI GK failed, using fallback", aiError);
+          setIsUsingFallback(true);
+          loaded = Array.from({ length: config.totalQuestions }).map((_, i) => ({
+            id: `gk-fallback-${i}`,
+            type: 'general_knowledge',
+            question: `Contoh Pertanyaan Umum #${i + 1}`,
+            options: ['Opsi A', 'Opsi B', 'Opsi C', 'Opsi D'],
+            answer: 'Opsi A',
+          }));
+        }
       } else {
         const mockMap: Record<string, Question[]> = {
           patterns: patternQuestions,
@@ -99,16 +149,23 @@ export function ExamManager() {
         return [...filtered, ...loaded];
       });
       setIsLoading(false);
+      
+      if (isUsingFallback) {
+        toast({
+          title: "Mode Offline Aktif",
+          description: "Gagal terhubung ke AI (Kuota Habis). Menggunakan bank soal cadangan agar ujian tetap lancar.",
+        });
+      }
     } catch (err: any) {
       console.error(err);
       setIsLoading(false);
       toast({ 
-        title: "Gagal memuat soal AI", 
-        description: err.message || "Cek API Key atau kuota.", 
+        title: "Kesalahan Sistem", 
+        description: "Gagal memuat soal. Silakan coba lagi.", 
         variant: "destructive" 
       });
     }
-  }, [currentSubIndex, toast]);
+  }, [currentSubIndex, toast, isUsingFallback]);
 
   useEffect(() => {
     fetchQuestions();
@@ -223,6 +280,11 @@ export function ExamManager() {
         <div className="space-y-1">
           <span className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground/60">Sub-Tes {currentSubIndex + 1} / {SUBTESTS.length}</span>
           <h2 className="text-2xl font-headline font-bold text-primary">{currentSubTest.name}</h2>
+          {isUsingFallback && (
+            <div className="flex items-center gap-1 text-[10px] text-amber-600 font-bold uppercase">
+              <WifiOff className="w-3 h-3" /> Offline Mode Active
+            </div>
+          )}
         </div>
         <SubTestTimer 
           key={`timer-${currentSubIndex}`}
@@ -242,13 +304,6 @@ export function ExamManager() {
             <div className="grid gap-3">
               {[1, 2, 3, 4].map(i => <Skeleton key={i} className="h-16 w-full" />)}
             </div>
-          </div>
-        ) : questions.length === 0 ? (
-          <div className="flex flex-col items-center justify-center py-20 gap-4 text-center">
-            <p className="text-destructive font-medium">Gagal memuat soal dari AI.</p>
-            <Button variant="outline" onClick={() => setRetryCount(prev => prev + 1)}>
-              <RefreshCcw className="w-4 h-4 mr-2" /> Coba Lagi
-            </Button>
           </div>
         ) : (
           <QuestionCard 

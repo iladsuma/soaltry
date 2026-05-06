@@ -1,7 +1,7 @@
 
 'use server';
 /**
- * @fileOverview A Genkit flow for generating Indonesian language questions using Gemini 2.0.
+ * @fileOverview A Genkit flow for generating Indonesian language questions using Gemini 2.0 Flash.
  */
 
 import { ai } from '@/ai/genkit';
@@ -39,13 +39,8 @@ const generateLanguageQuestionsPrompt = ai.definePrompt({
   Rules:
   1. Each question MUST be in Indonesian.
   2. Each question MUST have exactly 4 options.
-  3. The "answer" MUST be exactly one of the options.
+  3. The "answer" MUST be exactlys one of the options.
   4. Ensure questions are challenging and appropriate for professionals.
-  
-  Example Analogi:
-  Question: "KONTRAKTOR : BETON = ..."
-  Options: ["Pengacara : Hukum", "Sopir : Kendaraan", "Tukang : Kayu", "Guru : Murid"]
-  Answer: "Tukang : Kayu"
   
   Output ONLY valid JSON.`,
 });
@@ -59,11 +54,13 @@ const generateLanguageQuestionsFlow = ai.defineFlow(
   async (input) => {
     try {
       const { output } = await generateLanguageQuestionsPrompt(input);
-      if (!output) throw new Error('AI returned empty output');
+      if (!output || !output.questions || output.questions.length === 0) {
+        throw new Error('AI returned empty output');
+      }
       return output;
     } catch (error: any) {
       console.error('Error in generateLanguageQuestionsFlow:', error);
-      throw new Error(`Gagal menghasilkan soal bahasa: ${error.message}`);
+      throw new Error(error.message || 'Gagal menghasilkan soal bahasa');
     }
   }
 );
