@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { BrainCircuit, Timer, CheckSquare, Layers } from "lucide-react";
+import { BrainCircuit, Timer, CheckSquare, BookOpen } from "lucide-react";
 
 export default function Home() {
   return (
@@ -14,7 +14,7 @@ export default function Home() {
         </div>
         <nav>
           <Link href="/settings">
-            <Button variant="ghost" className="text-muted-foreground">Pengaturan</Button>
+            <Button variant="ghost" className="text-muted-foreground font-bold">Pengaturan Bank Soal</Button>
           </Link>
         </nav>
       </header>
@@ -26,18 +26,18 @@ export default function Home() {
               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-accent opacity-75"></span>
               <span className="relative inline-flex rounded-full h-2 w-2 bg-accent"></span>
             </span>
-            Platform Try Out Kognitif Modern
+            Platform Try Out Kognitif Fokus & Intensif
           </div>
           <h1 className="text-5xl md:text-7xl font-headline font-black leading-tight tracking-tighter text-foreground">
             Uji Potensi <span className="text-primary">Intelektual</span> Anda.
           </h1>
           <p className="text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed">
-            228 soal kognitif terstruktur dalam 6 sub-tes mendalam. Dirancang untuk mengasah kecepatan, ketepatan, dan logika berpikir Anda.
+            228 soal kognitif terstruktur dalam 3 sub-tes mendalam: Bahasa, Hitungan, dan Umum. Dirancang untuk simulasi ujian profesional dengan akurasi tinggi.
           </p>
           <div className="pt-4 flex flex-col sm:flex-row gap-4 justify-center">
             <Link href="/exam">
               <Button size="lg" className="h-14 px-10 text-lg rounded-full shadow-2xl bg-primary hover:bg-primary/90 transition-all hover:scale-105 active:scale-95">
-                Mulai Ujian Sekarang
+                Mulai Ujian (228 Soal)
               </Button>
             </Link>
           </div>
@@ -46,18 +46,18 @@ export default function Home() {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl w-full animate-in fade-in slide-in-from-bottom-8 duration-1000 delay-300">
           <FeatureCard 
             icon={<Timer className="w-6 h-6" />} 
-            title="Terukur & Terjadwal" 
-            desc="Sistem timer 7 menit per sub-tes untuk simulasi tekanan ujian yang nyata." 
+            title="Sistem Timer Per Sub-Tes" 
+            desc="Waktu 7 menit per kategori untuk melatih manajemen waktu di bawah tekanan." 
           />
           <FeatureCard 
-            icon={<Layers className="w-6 h-6" />} 
-            title="6 Dimensi Kognitif" 
-            desc="Mencakup Bahasa, Hitungan, Umum, Pola, Abstraksi, hingga Ruang dan Bentuk." 
+            icon={<BookOpen className="w-6 h-6" />} 
+            title="Fokus 3 Dimensi Utama" 
+            desc="Mencakup Verbal (Bahasa), Kuantitatif (Hitungan), dan Wawasan (Umum)." 
           />
           <FeatureCard 
             icon={<CheckSquare className="w-6 h-6" />} 
-            title="AI-Powered Questions" 
-            desc="Soal hitungan dan pengetahuan umum digenerasi secara cerdas oleh AI." 
+            title="Analisis Skor Akurat" 
+            desc="Hasil instan dengan perhitungan poin yang objektif berdasarkan jawaban benar." 
           />
         </div>
       </main>

@@ -1,4 +1,3 @@
-
 {
   "language": [
     { "question": "Sinonim dari 'Efisien' adalah...", "options": ["Tepat Guna", "Hemat", "Cepat", "Berdaya"], "answer": "Tepat Guna" },
@@ -35,39 +34,5 @@
     { "question": "Samudra terluas di dunia adalah...", "options": ["Hindia", "Atlantik", "Pasifik", "Arktik"], "answer": "Pasifik" },
     { "question": "Lagu kebangsaan Indonesia Raya diciptakan oleh...", "options": ["Ibu Sud", "W.R. Supratman", "C. Simanjuntak", "Ismail Marzuki"], "answer": "W.R. Supratman" },
     { "question": "Sandi Morse menggunakan kombinasi...", "options": ["Angka", "Huruf", "Titik dan Garis", "Warna"], "answer": "Titik dan Garis" }
-  ],
-  "patterns": [
-    { 
-      "question": "Perhatikan perubahan posisi objek pada pola di atas. Bentuk apa yang melengkapi kotak terakhir?", 
-      "options": ["Lingkaran Kecil", "Persegi Hitam", "Segitiga Terbalik", "Bintang Emas"], 
-      "answer": "Persegi Hitam",
-      "imageUrl": "https://picsum.photos/seed/iq-pattern-1/600/400",
-      "imageHint": "abstract geometric"
-    },
-    { 
-      "question": "Jika pola warna berpindah searah jarum jam, manakah posisi warna yang benar selanjutnya?", 
-      "options": ["Kiri Atas", "Kanan Atas", "Kiri Bawah", "Kanan Bawah"], 
-      "answer": "Kanan Bawah",
-      "imageUrl": "https://picsum.photos/seed/iq-pattern-2/600/400",
-      "imageHint": "minimalist pattern"
-    }
-  ],
-  "abstraction": [
-    { 
-      "question": "Analisa diagram hubungan di atas. Jika lingkaran mewakili 'Mamalia' dan persegi mewakili 'Hewan Air', bagian yang beririsan adalah...", 
-      "options": ["Ikan Hiu", "Paus", "Kura-kura", "Kepiting"], 
-      "answer": "Paus",
-      "imageUrl": "https://picsum.photos/seed/logic-abs-1/600/400",
-      "imageHint": "venn diagram"
-    }
-  ],
-  "spatial": [
-    { 
-      "question": "Jika jaring-jaring di atas dirakit menjadi kubus, sisi manakah yang akan berhadapan dengan sisi berwarna merah?", 
-      "options": ["Biru", "Kuning", "Hijau", "Putih"], 
-      "answer": "Hijau",
-      "imageUrl": "https://picsum.photos/seed/spatial-iq-1/600/400",
-      "imageHint": "folded shape"
-    }
   ]
 }

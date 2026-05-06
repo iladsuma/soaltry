@@ -3,8 +3,8 @@ import './globals.css';
 import { Toaster } from "@/components/ui/toaster";
 
 export const metadata: Metadata = {
-  title: 'CogniFlow | Try Out Kognitif Modern',
-  description: 'Uji potensi intelektual Anda dengan 228 soal kognitif mendalam.',
+  title: 'CogniFlow | Try Out Kognitif Fokus',
+  description: 'Uji potensi intelektual Anda dengan 228 soal kognitif intensif dalam 3 sub-tes utama.',
 };
 
 export default function RootLayout({
