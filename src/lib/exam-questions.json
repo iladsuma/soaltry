@@ -38,113 +38,36 @@
   ],
   "patterns": [
     { 
-      "question": "Lanjutkan pola urutan gambar berikut secara logis.", 
-      "options": ["Segitiga", "Persegi", "Lingkaran", "Bintang"], 
-      "answer": "Persegi",
-      "imageUrl": "https://picsum.photos/seed/pattern1/600/400",
-      "imageHint": "geometric pattern"
+      "question": "Perhatikan perubahan posisi objek pada pola di atas. Bentuk apa yang melengkapi kotak terakhir?", 
+      "options": ["Lingkaran Kecil", "Persegi Hitam", "Segitiga Terbalik", "Bintang Emas"], 
+      "answer": "Persegi Hitam",
+      "imageUrl": "https://picsum.photos/seed/iq-pattern-1/600/400",
+      "imageHint": "abstract geometric"
     },
     { 
-      "question": "Identifikasi bentuk yang melengkapi susunan pola di atas.", 
-      "options": ["A", "B", "C", "D"], 
-      "answer": "B",
-      "imageUrl": "https://picsum.photos/seed/pattern2/600/400",
-      "imageHint": "abstract logic"
-    },
-    { 
-      "question": "Jika gambar diputar 90 derajat searah jarum jam, manakah hasilnya?", 
-      "options": ["Opsi 1", "Opsi 2", "Opsi 3", "Opsi 4"], 
-      "answer": "Opsi 3",
-      "imageUrl": "https://picsum.photos/seed/pattern3/600/400",
-      "imageHint": "rotation logic"
-    },
-    { 
-      "question": "Pilih gambar yang tidak sesuai dengan kelompok pola ini.", 
-      "options": ["Gambar A", "Gambar B", "Gambar C", "Gambar D"], 
-      "answer": "Gambar D",
-      "imageUrl": "https://picsum.photos/seed/pattern4/600/400",
-      "imageHint": "odd one out"
-    },
-    { 
-      "question": "Lengkapi baris terakhir dari matriks gambar di atas.", 
-      "options": ["Atas", "Bawah", "Kiri", "Kanan"], 
-      "answer": "Atas",
-      "imageUrl": "https://picsum.photos/seed/pattern5/600/400",
-      "imageHint": "matrix reasoning"
+      "question": "Jika pola warna berpindah searah jarum jam, manakah posisi warna yang benar selanjutnya?", 
+      "options": ["Kiri Atas", "Kanan Atas", "Kiri Bawah", "Kanan Bawah"], 
+      "answer": "Kanan Bawah",
+      "imageUrl": "https://picsum.photos/seed/iq-pattern-2/600/400",
+      "imageHint": "minimalist pattern"
     }
   ],
   "abstraction": [
     { 
-      "question": "Berdasarkan diagram logika di atas, apa kesimpulan yang paling tepat?", 
-      "options": ["Semua S adalah P", "Sebagian S adalah P", "Tidak ada S yang P", "Semua P adalah S"], 
-      "answer": "Sebagian S adalah P",
-      "imageUrl": "https://picsum.photos/seed/logic1/600/400",
+      "question": "Analisa diagram hubungan di atas. Jika lingkaran mewakili 'Mamalia' dan persegi mewakili 'Hewan Air', bagian yang beririsan adalah...", 
+      "options": ["Ikan Hiu", "Paus", "Kura-kura", "Kepiting"], 
+      "answer": "Paus",
+      "imageUrl": "https://picsum.photos/seed/logic-abs-1/600/400",
       "imageHint": "venn diagram"
-    },
-    { 
-      "question": "Manakah representasi visual yang tepat untuk hubungan variabel A > B?", 
-      "options": ["Grafik 1", "Grafik 2", "Grafik 3", "Grafik 4"], 
-      "answer": "Grafik 1",
-      "imageUrl": "https://picsum.photos/seed/logic2/600/400",
-      "imageHint": "logic relation"
-    },
-    { 
-      "question": "Identifikasi alur yang paling efisien dari titik A ke B.", 
-      "options": ["Jalur Merah", "Jalur Biru", "Jalur Hijau", "Jalur Kuning"], 
-      "answer": "Jalur Biru",
-      "imageUrl": "https://picsum.photos/seed/logic3/600/400",
-      "imageHint": "flowchart logic"
-    },
-    { 
-      "question": "Jika Premis 1 dan 2 benar, manakah gambar yang mewakili kesimpulan?", 
-      "options": ["Gambar A", "Gambar B", "Gambar C", "Gambar D"], 
-      "answer": "Gambar C",
-      "imageUrl": "https://picsum.photos/seed/logic4/600/400",
-      "imageHint": "syllogism visual"
-    },
-    { 
-      "question": "Pecahkan sandi simbolik yang ada pada tabel di atas.", 
-      "options": ["X = 5", "X = 10", "X = 15", "X = 20"], 
-      "answer": "X = 10",
-      "imageUrl": "https://picsum.photos/seed/logic5/600/400",
-      "imageHint": "symbolic table"
     }
   ],
   "spatial": [
     { 
-      "question": "Manakah hasil lipatan yang benar dari jaring-jaring kubus tersebut?", 
-      "options": ["Kubus A", "Kubus B", "Kubus C", "Kubus D"], 
-      "answer": "Kubus B",
-      "imageUrl": "https://picsum.photos/seed/spatial1/600/400",
-      "imageHint": "cube folding"
-    },
-    { 
-      "question": "Berapa jumlah balok penyusun pada tumpukan gambar di atas?", 
-      "options": ["10", "12", "14", "16"], 
-      "answer": "14",
-      "imageUrl": "https://picsum.photos/seed/spatial2/600/400",
-      "imageHint": "block counting"
-    },
-    { 
-      "question": "Jika objek ini diputar secara horizontal 180 derajat, manakah hasilnya?", 
-      "options": ["Opsi A", "Opsi B", "Opsi C", "Opsi D"], 
-      "answer": "Opsi A",
-      "imageUrl": "https://picsum.photos/seed/spatial3/600/400",
-      "imageHint": "3d rotation"
-    },
-    { 
-      "question": "Manakah potongan yang tepat untuk melengkapi lubang pada benda 3D ini?", 
-      "options": ["Potongan 1", "Potongan 2", "Potongan 3", "Potongan 4"], 
-      "answer": "Potongan 4",
-      "imageUrl": "https://picsum.photos/seed/spatial4/600/400",
-      "imageHint": "spatial fit"
-    },
-    { 
-      "question": "Identifikasi bayangan cermin yang benar untuk objek di atas.", 
-      "options": ["Bayangan A", "Bayangan B", "Bayangan C", "Bayangan D"], 
-      "answer": "Bayangan B",
-      "imageUrl": "https://picsum.photos/seed/spatial5/600/400",
-      "imageHint": "mirror image"
+      "question": "Jika jaring-jaring di atas dirakit menjadi kubus, sisi manakah yang akan berhadapan dengan sisi berwarna merah?", 
+      "options": ["Biru", "Kuning", "Hijau", "Putih"], 
+      "answer": "Hijau",
+      "imageUrl": "https://picsum.photos/seed/spatial-iq-1/600/400",
+      "imageHint": "folded shape"
     }
   ]
 }
