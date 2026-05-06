@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useState, useEffect } from "react";
@@ -15,26 +14,28 @@ import { SimulatedPermissionError } from "@/lib/errors";
 export default function SettingsPage() {
   const { toast } = useToast();
   const [jsonInput, setJsonInput] = useState("");
+  const [detectedKeys, setDetectedKeys] = useState<string[]>([]);
   const [stats, setStats] = useState<Record<string, number>>({});
   const [totalCount, setTotalCount] = useState(0);
-
-  const subtestKeys = ["lang_fast", "lang_tricky", "gen_fast", "gen_random", "calc_easy", "calc_mixed"];
 
   const calculateStats = (jsonString: string) => {
     try {
       const parsed = JSON.parse(jsonString);
       const newStats: Record<string, number> = {};
+      const keys = Object.keys(parsed);
       let total = 0;
       
-      subtestKeys.forEach(key => {
+      keys.forEach(key => {
         const count = Array.isArray(parsed[key]) ? parsed[key].length : 0;
         newStats[key] = count;
         total += count;
       });
 
+      setDetectedKeys(keys);
       setStats(newStats);
       setTotalCount(total);
     } catch (e) {
+      setDetectedKeys([]);
       setStats({});
       setTotalCount(0);
     }
@@ -56,7 +57,7 @@ export default function SettingsPage() {
       
       toast({
         title: "Berhasil Disimpan",
-        description: `Bank soal kustom aktif dengan total ${totalCount} soal terdeteksi.`,
+        description: `Bank soal aktif dengan total ${totalCount} soal terdeteksi di ${detectedKeys.length} kategori.`,
       });
     } catch (e) {
       toast({
@@ -70,6 +71,7 @@ export default function SettingsPage() {
   const handleReset = () => {
     localStorage.removeItem("custom_exam_questions");
     setJsonInput("");
+    setDetectedKeys([]);
     setStats({});
     setTotalCount(0);
     toast({
@@ -82,7 +84,7 @@ export default function SettingsPage() {
     const error = new SimulatedPermissionError({
       path: '/localstorage/bank_soal/data',
       operation: 'write',
-      requestResourceData: { status: "Syncing...", questions: totalCount }
+      requestResourceData: { status: "Syncing...", keys: detectedKeys }
     });
     errorEmitter.emit('permission-error', error);
   };
@@ -138,14 +140,21 @@ export default function SettingsPage() {
                 {totalCount} <span className="text-xs font-normal opacity-80 uppercase">Soal Terdeteksi</span>
               </div>
             </div>
-            <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-              {subtestKeys.map(key => (
-                <div key={key} className={`flex justify-between items-center p-3 rounded-xl border shadow-sm ${stats[key] > 0 ? 'bg-white' : 'bg-muted/30 opacity-50'}`}>
-                  <span className="text-[10px] font-bold uppercase text-muted-foreground">{key.replace('_', ' ')}</span>
-                  <span className={`font-black ${stats[key] > 0 ? 'text-primary' : 'text-muted-foreground'}`}>{stats[key] || 0}</span>
-                </div>
-              ))}
-            </div>
+            
+            {detectedKeys.length > 0 ? (
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+                {detectedKeys.map(key => (
+                  <div key={key} className="flex justify-between items-center p-3 rounded-xl border shadow-sm bg-white">
+                    <span className="text-[10px] font-bold uppercase text-muted-foreground truncate mr-2" title={key}>{key.replace('_', ' ')}</span>
+                    <span className="font-black text-primary">{stats[key]}</span>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="text-center py-4 text-muted-foreground italic text-sm">
+                Belum ada data soal yang terdeteksi. Silakan tempel JSON atau unggah file.
+              </div>
+            )}
           </CardContent>
         </Card>
 
@@ -156,7 +165,7 @@ export default function SettingsPage() {
               Editor JSON Soal
             </CardTitle>
             <CardDescription>
-              Isi kategori yang Anda butuhkan saja. Simpan soal kustom Anda di sini secara aman dan offline di browser.
+              Masukkan soal Anda dalam format JSON. Anda bisa menggunakan nama kategori apa saja (misal: "koperasi_desa").
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-6">
@@ -191,7 +200,7 @@ export default function SettingsPage() {
               </div>
               <Textarea
                 id="json-input"
-                placeholder='{ "lang_fast": [{ "question": "...", "options": [...], "answer": "..." }] }'
+                placeholder='{ "koperasi_desa": [{ "question": "...", "options": [...], "answer": "..." }] }'
                 className="min-h-[400px] font-mono text-xs leading-relaxed"
                 value={jsonInput}
                 onChange={(e) => {

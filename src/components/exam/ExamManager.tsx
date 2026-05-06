@@ -1,8 +1,7 @@
-
 "use client";
 
 import { useState, useEffect, useCallback, useMemo } from "react";
-import { SUBTESTS, Question, SubTestType } from "@/lib/types";
+import { SUBTESTS, Question, SubTestType, SubTestConfig } from "@/lib/types";
 import defaultExamData from "@/lib/exam-questions.json";
 import { SubTestTimer } from "./SubTestTimer";
 import { QuestionCard } from "./QuestionCard";
@@ -19,6 +18,7 @@ export function ExamManager() {
   const [currentQIndex, setCurrentQIndex] = useState(0);
   const [questions, setQuestions] = useState<Question[]>([]);
   const [fullBank, setFullBank] = useState<Record<string, any>>({});
+  const [activeSubtests, setActiveSubtests] = useState<SubTestConfig[]>([]);
   const [answers, setAnswers] = useState<Record<string, string>>({});
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
@@ -32,7 +32,8 @@ export function ExamManager() {
 
     if (customSaved) {
       try {
-        activeData = JSON.parse(customSaved);
+        const parsed = JSON.parse(customSaved);
+        activeData = parsed;
         setIsCustomMode(true);
       } catch (e) {
         setIsCustomMode(false);
@@ -40,13 +41,29 @@ export function ExamManager() {
     }
 
     setFullBank(activeData);
+    
+    // Create dynamic subtest list from keys found in the bank
+    const keys = Object.keys(activeData);
+    const dynamicSubtests: SubTestConfig[] = keys.map(key => {
+      // Find original config if exists, otherwise create new
+      const original = SUBTESTS.find(s => s.id === key);
+      return original || {
+        id: key as SubTestType,
+        name: key.replace(/_/g, ' ').toUpperCase(),
+        description: `Kategori kustom dari bank soal Anda.`,
+        duration: 420,
+        totalQuestions: activeData[key].length
+      };
+    });
+
+    setActiveSubtests(dynamicSubtests);
     setIsLoading(false);
   }, []);
 
   useEffect(() => {
-    if (Object.keys(fullBank).length === 0) return;
+    if (Object.keys(fullBank).length === 0 || activeSubtests.length === 0) return;
 
-    const config = SUBTESTS[currentSubIndex];
+    const config = activeSubtests[currentSubIndex];
     const rawData = (fullBank as any)[config.id] || [];
     
     const loaded: Question[] = rawData.map((q: any, i: number) => ({
@@ -57,33 +74,30 @@ export function ExamManager() {
 
     setQuestions(loaded);
     setCurrentQIndex(0);
-  }, [currentSubIndex, fullBank]);
+  }, [currentSubIndex, fullBank, activeSubtests]);
 
   const handleNextSubTest = useCallback(() => {
-    if (currentSubIndex < SUBTESTS.length - 1) {
+    if (currentSubIndex < activeSubtests.length - 1) {
       setCurrentSubIndex(prev => prev + 1);
       toast({
         title: "Sub-Tes Selesai",
-        description: `Beralih ke sub-tes: ${SUBTESTS[currentSubIndex + 1].name}`,
+        description: `Beralih ke: ${activeSubtests[currentSubIndex + 1].name}`,
       });
     } else {
       setIsCompleted(true);
     }
-  }, [currentSubIndex, toast]);
+  }, [currentSubIndex, activeSubtests, toast]);
 
   const handleSaveAndContinue = async () => {
     setIsSaving(true);
     
-    // Simulasi Delay Sinkronisasi
     await new Promise(resolve => setTimeout(resolve, 600));
 
-    // SIMULASI GLITCH (Khas Kopdes): 
-    // Ada 40% kemungkinan jawaban berubah sendiri saat klik simpan
+    // SIMULASI GLITCH (Kopdes Style)
     const shouldGlitch = Math.random() < 0.4;
     const currentQ = questions[currentQIndex];
 
     if (shouldGlitch && currentQ && answers[currentQ.id]) {
-      // Ubah jawaban ke opsi lain secara acak
       const currentAnswer = answers[currentQ.id];
       const otherOptions = currentQ.options.filter(o => o !== currentAnswer);
       const randomFakeAnswer = otherOptions[Math.floor(Math.random() * otherOptions.length)];
@@ -96,7 +110,7 @@ export function ExamManager() {
         title: "Sinkronisasi Gagal",
         description: "Terjadi gangguan pada database (Error 503). Jawaban terdeteksi berubah, silakan periksa dan simpan ulang.",
       });
-      return; // Berhenti di sini, tidak lanjut ke soal berikutnya
+      return; 
     }
 
     setIsSaving(false);
@@ -120,7 +134,7 @@ export function ExamManager() {
     let score = 0;
     let totalPossible = 0;
 
-    SUBTESTS.forEach(config => {
+    activeSubtests.forEach(config => {
       const subQuestions = (fullBank as any)[config.id] || [];
       totalPossible += subQuestions.length;
       
@@ -138,7 +152,7 @@ export function ExamManager() {
       maxPossible: totalPossible,
       answeredCount: Object.keys(answers).length
     };
-  }, [isCompleted, fullBank, answers]);
+  }, [isCompleted, fullBank, answers, activeSubtests]);
 
   if (isCompleted && finalResults) {
     return (
@@ -148,7 +162,7 @@ export function ExamManager() {
         </div>
         <div className="space-y-2">
           <h1 className="text-4xl font-headline font-black text-primary">Hasil Akhir</h1>
-          <p className="text-muted-foreground text-lg">Performa kognitif 6 sub-tes terakumulasi.</p>
+          <p className="text-muted-foreground text-lg">Performa kognitif terakumulasi.</p>
         </div>
         <Card className="w-full max-w-md border-primary/20 shadow-2xl overflow-hidden">
           <div className="bg-primary p-8 text-white">
@@ -174,27 +188,29 @@ export function ExamManager() {
     );
   }
 
-  const currentSubTest = SUBTESTS[currentSubIndex];
-  const progressPercent = ((currentSubIndex * 100) + ((currentQIndex / Math.max(1, questions.length)) * 100)) / SUBTESTS.length;
+  const currentSubTest = activeSubtests[currentSubIndex];
+  const progressPercent = activeSubtests.length > 0 ? ((currentSubIndex * 100) + ((currentQIndex / Math.max(1, questions.length)) * 100)) / activeSubtests.length : 0;
 
   return (
     <div className="max-w-4xl mx-auto space-y-8">
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white/60 p-5 rounded-2xl border shadow-sm">
-        <div className="space-y-1">
-          <div className="flex items-center gap-2">
-            <span className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground/60">Sub-Tes {currentSubIndex + 1} / {SUBTESTS.length}</span>
-            {isCustomMode && <Database className="w-3 h-3 text-accent" title="Menggunakan Bank Soal Kustom" />}
+      {activeSubtests.length > 0 && (
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white/60 p-5 rounded-2xl border shadow-sm">
+          <div className="space-y-1">
+            <div className="flex items-center gap-2">
+              <span className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground/60">Sub-Tes {currentSubIndex + 1} / {activeSubtests.length}</span>
+              {isCustomMode && <Database className="w-3 h-3 text-accent" title="Menggunakan Bank Soal Kustom" />}
+            </div>
+            <h2 className="text-2xl font-headline font-bold text-primary">{currentSubTest?.name}</h2>
+            <p className="text-xs text-muted-foreground italic">{currentSubTest?.description}</p>
           </div>
-          <h2 className="text-2xl font-headline font-bold text-primary">{currentSubTest.name}</h2>
-          <p className="text-xs text-muted-foreground italic">{currentSubTest.description}</p>
+          <SubTestTimer 
+            key={`timer-${currentSubIndex}`}
+            initialSeconds={currentSubTest?.duration || 420} 
+            onExpire={handleNextSubTest} 
+            isActive={!isLoading && !isCompleted}
+          />
         </div>
-        <SubTestTimer 
-          key={`timer-${currentSubIndex}`}
-          initialSeconds={currentSubTest.duration} 
-          onExpire={handleNextSubTest} 
-          isActive={!isLoading && !isCompleted}
-        />
-      </div>
+      )}
 
       <Progress value={progressPercent} className="h-2 bg-white border" />
 
@@ -214,7 +230,7 @@ export function ExamManager() {
               <>
                 <AlertCircle className="w-12 h-12 text-destructive" />
                 <p className="text-muted-foreground">
-                  Data soal untuk <b>{currentSubTest.name}</b> tidak ditemukan.
+                  Data soal tidak ditemukan. Pastikan format JSON benar.
                 </p>
                 <Link href="/settings">
                   <Button variant="outline">Cek Pengaturan</Button>
