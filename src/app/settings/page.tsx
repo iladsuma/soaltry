@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState, useEffect } from "react";
@@ -7,7 +8,9 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import Link from "next/link";
-import { ArrowLeft, Settings2, FileJson, Save, RotateCcw, Upload, Info, CheckCircle2, ListChecks, BarChart3 } from "lucide-react";
+import { ArrowLeft, Settings2, FileJson, Save, RotateCcw, Upload, Info, BarChart3, Bug } from "lucide-react";
+import { errorEmitter } from "@/firebase/error-emitter";
+import { FirestorePermissionError } from "@/firebase/errors";
 
 export default function SettingsPage() {
   const { toast } = useToast();
@@ -86,6 +89,15 @@ export default function SettingsPage() {
     });
   };
 
+  const simulatePermissionError = () => {
+    const error = new FirestorePermissionError({
+      path: '/databases/(default)/documents/bank_soal/custom_data',
+      operation: 'update',
+      requestResourceData: { totalQuestions: totalCount, lastUpdated: new Date().toISOString() }
+    });
+    errorEmitter.emit('permission-error', error);
+  };
+
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -118,7 +130,12 @@ export default function SettingsPage() {
               <p className="text-muted-foreground">Konfigurasi 6 sub-tes (Total Target 228 Soal).</p>
             </div>
           </div>
-          <Settings2 className="w-8 h-8 text-accent opacity-50" />
+          <div className="flex gap-2">
+            <Button variant="outline" size="sm" className="rounded-full border-dashed" onClick={simulatePermissionError}>
+              <Bug className="w-4 h-4 mr-2" /> Simulasi Error
+            </Button>
+            <Settings2 className="w-8 h-8 text-accent opacity-50" />
+          </div>
         </header>
 
         {totalCount > 0 && (
@@ -205,21 +222,6 @@ export default function SettingsPage() {
                 <Save className="w-4 h-4" /> Simpan Bank Soal
               </Button>
             </div>
-          </CardContent>
-        </Card>
-
-        <Card className="bg-primary/5 border-dashed border-primary/30">
-          <CardHeader>
-            <CardTitle className="text-sm flex items-center gap-2">
-              <Info className="w-4 h-4" /> Karakteristik 228 Soal
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <ul className="text-xs text-muted-foreground space-y-2 list-disc pl-4">
-              <li>Setiap sub-tes (6 kategori) idealnya memiliki <b>38 soal</b> untuk mencapai target 228 soal.</li>
-              <li>Aplikasi akan mendeteksi jumlah soal per kategori secara otomatis di atas kotak input.</li>
-              <li>Pastikan format JSON valid agar sistem penskoran bekerja dengan benar.</li>
-            </ul>
           </CardContent>
         </Card>
       </div>

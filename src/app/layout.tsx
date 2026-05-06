@@ -1,6 +1,8 @@
+
 import type {Metadata} from 'next';
 import './globals.css';
 import { Toaster } from "@/components/ui/toaster";
+import { FirebaseErrorListener } from "@/components/FirebaseErrorListener";
 
 export const metadata: Metadata = {
   title: 'CogniFlow | Try Out Kognitif Fokus',
@@ -21,6 +23,7 @@ export default function RootLayout({
       </head>
       <body className="font-body antialiased bg-background text-foreground">
         {children}
+        <FirebaseErrorListener />
         <Toaster />
       </body>
     </html>
