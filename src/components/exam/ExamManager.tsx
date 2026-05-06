@@ -66,6 +66,7 @@ export function ExamManager() {
       }
       setQuestions(loaded);
       setAllQuestionsRecord(prev => {
+        // Gabungkan soal unik agar bisa diskor di akhir
         const filtered = prev.filter(p => !loaded.find(l => l.id === p.id));
         return [...filtered, ...loaded];
       });
@@ -94,6 +95,7 @@ export function ExamManager() {
     setIsSaving(true);
     const currentQ = questions[currentQIndex];
     
+    // Simulasi delay simpan
     await new Promise(resolve => setTimeout(resolve, 800));
     
     // REPLIKASI GLITCH KOPDES (40% probabilitas)
@@ -110,7 +112,7 @@ export function ExamManager() {
       setIsSaving(false);
       toast({
         title: "Koneksi Tidak Stabil",
-        description: "Status simpan: GAGAL. Jawaban mungkin ter-reset atau berubah. Silakan ulangi.",
+        description: "Status simpan: GAGAL (Sync Error). Jawaban mungkin berubah. Silakan periksa kembali.",
         variant: "destructive",
       });
       return;
@@ -192,7 +194,9 @@ export function ExamManager() {
           <span className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground/60">Sub-Tes {currentSubIndex + 1} / {SUBTESTS.length}</span>
           <h2 className="text-2xl font-headline font-bold text-primary">{currentSubTest.name}</h2>
         </div>
+        {/* KEY adalah rahasia untuk mereset timer setiap sub-tes */}
         <SubTestTimer 
+          key={`timer-${currentSubIndex}`}
           initialSeconds={currentSubTest.duration} 
           onExpire={handleNextSubTest} 
           isActive={!isLoading && !isCompleted}

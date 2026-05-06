@@ -14,10 +14,6 @@ export function SubTestTimer({ initialSeconds, onExpire, isActive }: SubTestTime
   const [timeLeft, setTimeLeft] = useState(initialSeconds);
 
   useEffect(() => {
-    setTimeLeft(initialSeconds);
-  }, [initialSeconds]);
-
-  useEffect(() => {
     if (!isActive || timeLeft <= 0) return;
 
     const timer = setInterval(() => {
@@ -27,7 +23,7 @@ export function SubTestTimer({ initialSeconds, onExpire, isActive }: SubTestTime
     return () => clearInterval(timer);
   }, [isActive, timeLeft]);
 
-  // Handle expiration in a separate effect to avoid side-effects during render or state updates of children
+  // Handle expiration
   useEffect(() => {
     if (timeLeft === 0 && isActive) {
       onExpire();
