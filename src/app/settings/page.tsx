@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useState, useEffect } from "react";
@@ -50,24 +49,15 @@ export default function SettingsPage() {
 
   const handleSave = () => {
     try {
-      const parsed = JSON.parse(jsonInput);
-      const missingKeys = subtestKeys.filter(key => !parsed[key]);
-      
-      if (missingKeys.length > 0) {
-        toast({
-          title: "Format Tidak Lengkap",
-          description: `JSON harus memiliki kunci: ${missingKeys.join(", ")}`,
-          variant: "destructive",
-        });
-        return;
-      }
+      // Validasi hanya mengecek apakah ini JSON valid
+      JSON.parse(jsonInput);
 
       localStorage.setItem("custom_exam_questions", jsonInput);
       calculateStats(jsonInput);
       
       toast({
         title: "Berhasil Disimpan",
-        description: `Bank soal kustom aktif dengan total ${totalCount} soal.`,
+        description: `Bank soal kustom aktif dengan total ${totalCount} soal terdeteksi.`,
       });
     } catch (e) {
       toast({
@@ -127,7 +117,7 @@ export default function SettingsPage() {
             </Link>
             <div>
               <h1 className="text-3xl font-headline font-bold text-primary">Manajemen Bank Soal</h1>
-              <p className="text-muted-foreground">Konfigurasi 6 sub-tes (Total Target 228 Soal).</p>
+              <p className="text-muted-foreground">Konfigurasi bebas (Input soal seperlunya).</p>
             </div>
           </div>
           <div className="flex gap-2">
@@ -138,38 +128,36 @@ export default function SettingsPage() {
           </div>
         </header>
 
-        {totalCount > 0 && (
-          <Card className="border-primary bg-primary/5 shadow-md">
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between mb-4">
-                <div className="flex items-center gap-2 text-primary font-bold">
-                  <BarChart3 className="w-5 h-5" />
-                  <span>Status Bank Soal Aktif</span>
-                </div>
-                <div className="px-4 py-1 bg-primary text-white rounded-full font-black text-xl shadow-lg">
-                  {totalCount} <span className="text-xs font-normal opacity-80 uppercase">Soal</span>
-                </div>
+        <Card className="border-primary bg-primary/5 shadow-md">
+          <CardContent className="p-6">
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center gap-2 text-primary font-bold">
+                <BarChart3 className="w-5 h-5" />
+                <span>Statistik Input Soal</span>
               </div>
-              <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-                {subtestKeys.map(key => (
-                  <div key={key} className="flex justify-between items-center p-3 rounded-xl bg-white border shadow-sm">
-                    <span className="text-[10px] font-bold uppercase text-muted-foreground">{key.replace('_', ' ')}</span>
-                    <span className="font-black text-primary">{stats[key] || 0}</span>
-                  </div>
-                ))}
+              <div className="px-4 py-1 bg-primary text-white rounded-full font-black text-xl shadow-lg">
+                {totalCount} <span className="text-xs font-normal opacity-80 uppercase">Total Soal</span>
               </div>
-            </CardContent>
-          </Card>
-        )}
+            </div>
+            <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+              {subtestKeys.map(key => (
+                <div key={key} className={`flex justify-between items-center p-3 rounded-xl border shadow-sm ${stats[key] > 0 ? 'bg-white' : 'bg-muted/30 opacity-50'}`}>
+                  <span className="text-[10px] font-bold uppercase text-muted-foreground">{key.replace('_', ' ')}</span>
+                  <span className={`font-black ${stats[key] > 0 ? 'text-primary' : 'text-muted-foreground'}`}>{stats[key] || 0}</span>
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
 
         <Card className="shadow-xl border-primary/10">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <FileJson className="w-5 h-5 text-primary" />
-              Editor JSON (6 Sub-Tes)
+              Editor JSON Fleksibel
             </CardTitle>
             <CardDescription>
-              Tempelkan 228 soal kognitif yang telah dibagi ke dalam 6 kategori spesifik.
+              Masukkan soal kustom Anda. Tidak perlu mengisi semua kategori. Kategori yang kosong akan otomatis dilewati saat ujian.
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-6">
@@ -204,7 +192,7 @@ export default function SettingsPage() {
               </div>
               <Textarea
                 id="json-input"
-                placeholder='{ "lang_fast": [...], "lang_tricky": [...], ... }'
+                placeholder='{ "lang_fast": [{ "question": "...", "options": [...], "answer": "..." }] }'
                 className="min-h-[400px] font-mono text-xs leading-relaxed"
                 value={jsonInput}
                 onChange={(e) => {
