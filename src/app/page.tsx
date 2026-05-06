@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { BrainCircuit, Timer, CheckSquare, BookOpen } from "lucide-react";
+import { BrainCircuit, Timer, CheckSquare, Zap, Target, Layers } from "lucide-react";
 
 export default function Home() {
   return (
@@ -14,7 +14,7 @@ export default function Home() {
         </div>
         <nav>
           <Link href="/settings">
-            <Button variant="ghost" className="text-muted-foreground font-bold">Pengaturan Bank Soal</Button>
+            <Button variant="ghost" className="text-muted-foreground font-bold">Bank Soal (228)</Button>
           </Link>
         </nav>
       </header>
@@ -22,22 +22,19 @@ export default function Home() {
       <main className="flex-1 flex flex-col items-center justify-center p-6 text-center space-y-12">
         <div className="space-y-6 max-w-3xl animate-in fade-in slide-in-from-top-4 duration-1000">
           <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-accent/10 text-accent-foreground font-bold text-sm border border-accent/20">
-            <span className="relative flex h-2 w-2">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-accent opacity-75"></span>
-              <span className="relative inline-flex rounded-full h-2 w-2 bg-accent"></span>
-            </span>
-            Platform Try Out Kognitif Fokus & Intensif
+            <Zap className="w-4 h-4 text-accent" />
+            Simulasi Kognitif 6 Sub-Tes Intensif
           </div>
           <h1 className="text-5xl md:text-7xl font-headline font-black leading-tight tracking-tighter text-foreground">
-            Uji Potensi <span className="text-primary">Intelektual</span> Anda.
+            Akurasi <span className="text-primary">Intelektual</span> Tanpa Batas.
           </h1>
           <p className="text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed">
-            228 soal kognitif terstruktur dalam 3 sub-tes mendalam: Bahasa, Hitungan, dan Umum. Dirancang untuk simulasi ujian profesional dengan akurasi tinggi.
+            Uji refleks dan ketelitian Anda dengan <b>228 soal</b> yang dibagi ke dalam 6 dimensi kognitif: Bahasa, Hitungan, dan Pengetahuan Umum dengan tingkat kesulitan bertingkat.
           </p>
           <div className="pt-4 flex flex-col sm:flex-row gap-4 justify-center">
             <Link href="/exam">
               <Button size="lg" className="h-14 px-10 text-lg rounded-full shadow-2xl bg-primary hover:bg-primary/90 transition-all hover:scale-105 active:scale-95">
-                Mulai Ujian (228 Soal)
+                Mulai Ujian Intensif
               </Button>
             </Link>
           </div>
@@ -45,25 +42,25 @@ export default function Home() {
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl w-full animate-in fade-in slide-in-from-bottom-8 duration-1000 delay-300">
           <FeatureCard 
+            icon={<Target className="w-6 h-6" />} 
+            title="6 Dimensi Taktis" 
+            desc="Bahasa (Fast/Tricky), Umum (Fast/Random), dan Hitungan (Easy/Mixed)." 
+          />
+          <FeatureCard 
             icon={<Timer className="w-6 h-6" />} 
-            title="Sistem Timer Per Sub-Tes" 
-            desc="Waktu 7 menit per kategori untuk melatih manajemen waktu di bawah tekanan." 
+            title="Sistem 7 Menit" 
+            desc="Timer ketat per kategori untuk melatih tekanan mental dan manajemen waktu." 
           />
           <FeatureCard 
-            icon={<BookOpen className="w-6 h-6" />} 
-            title="Fokus 3 Dimensi Utama" 
-            desc="Mencakup Verbal (Bahasa), Kuantitatif (Hitungan), dan Wawasan (Umum)." 
-          />
-          <FeatureCard 
-            icon={<CheckSquare className="w-6 h-6" />} 
-            title="Analisis Skor Akurat" 
-            desc="Hasil instan dengan perhitungan poin yang objektif berdasarkan jawaban benar." 
+            icon={<Layers className="w-6 h-6" />} 
+            title="228 Soal Terstruktur" 
+            desc="Volume soal besar untuk simulasi ujian profesional yang sesungguhnya." 
           />
         </div>
       </main>
 
       <footer className="p-8 text-muted-foreground text-sm font-medium">
-        © 2024 CogniFlow. Focused intellect for professional success.
+        © 2024 CogniFlow. Developed for High-Performance Intellectual Testing.
       </footer>
     </div>
   );

@@ -8,8 +8,9 @@ import { QuestionCard } from "./QuestionCard";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { useToast } from "@/hooks/use-toast";
-import { ArrowRight, Loader2, Trophy, AlertCircle, Database } from "lucide-react";
+import { ArrowRight, Loader2, Trophy, AlertCircle, Database, Info } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
+import Link from "next/link";
 
 export function ExamManager() {
   const { toast } = useToast();
@@ -17,7 +18,7 @@ export function ExamManager() {
   const [currentQIndex, setCurrentQIndex] = useState(0);
   const [questions, setQuestions] = useState<Question[]>([]);
   const [allQuestionsRecord, setAllQuestionsRecord] = useState<Question[]>([]);
-  const [answers, setAnswers] = useState<Record<string, string | number>>({});
+  const [answers, setAnswers] = useState<Record<string, string>>({});
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
   const [isCompleted, setIsCompleted] = useState(false);
@@ -25,7 +26,6 @@ export function ExamManager() {
 
   const currentSubTest = SUBTESTS[currentSubIndex];
 
-  // Memuat soal dari storage atau default
   const loadQuestions = useCallback(() => {
     setIsLoading(true);
     const config = SUBTESTS[currentSubIndex];
@@ -38,7 +38,6 @@ export function ExamManager() {
         activeData = JSON.parse(customSaved);
         setIsCustomMode(true);
       } catch (e) {
-        console.error("Gagal memuat soal kustom, menggunakan default.");
         setIsCustomMode(false);
       }
     } else {
@@ -49,15 +48,15 @@ export function ExamManager() {
     
     const loaded: Question[] = rawData.map((q: any, i: number) => ({
       ...q,
-      id: `${config.id}-${currentSubIndex}-${i}`,
+      id: `${config.id}-${i}`,
       type: config.id as SubTestType
     }));
 
     setQuestions(loaded);
     
     setAllQuestionsRecord(prev => {
-      const filtered = prev.filter(p => !loaded.find(l => l.id === p.id));
-      return [...filtered, ...loaded];
+      const otherSubTests = prev.filter(p => p.type !== config.id);
+      return [...otherSubTests, ...loaded];
     });
 
     setIsLoading(false);
@@ -71,33 +70,21 @@ export function ExamManager() {
   const handleNextSubTest = useCallback(() => {
     if (currentSubIndex < SUBTESTS.length - 1) {
       setCurrentSubIndex(prev => prev + 1);
+      toast({
+        title: "Sub-Tes Selesai",
+        description: `Beralih ke sub-tes: ${SUBTESTS[currentSubIndex + 1].name}`,
+      });
     } else {
       setIsCompleted(true);
     }
-  }, [currentSubIndex]);
+  }, [currentSubIndex, toast]);
 
   const handleSaveAndContinue = async () => {
     setIsSaving(true);
-    const currentQ = questions[currentQIndex];
     
-    await new Promise(resolve => setTimeout(resolve, 300));
+    // Simulate minor delay for UX
+    await new Promise(resolve => setTimeout(resolve, 150));
     
-    // REPLIKASI GLITCH KOPDES (Ganti jawaban secara acak 10% kemungkinan)
-    const isGlitch = Math.random() < 0.1;
-    if (isGlitch && currentQ && currentQ.options) {
-      const otherOptions = currentQ.options.filter(o => o !== answers[currentQ.id]);
-      const randomOption = otherOptions[Math.floor(Math.random() * otherOptions.length)];
-      setAnswers(prev => ({ ...prev, [currentQ.id]: randomOption }));
-      
-      setIsSaving(false);
-      toast({
-        title: "Sync Anomaly",
-        description: "Data tersinkronisasi dengan penyesuaian otomatis.",
-        variant: "destructive",
-      });
-      return;
-    }
-
     setIsSaving(false);
     if (currentQIndex < questions.length - 1) {
       setCurrentQIndex(prev => prev + 1);
@@ -109,7 +96,7 @@ export function ExamManager() {
   const updateAnswer = (val: string | number) => {
     const q = questions[currentQIndex];
     if (q) {
-      setAnswers(prev => ({ ...prev, [q.id]: val }));
+      setAnswers(prev => ({ ...prev, [q.id]: String(val) }));
     }
   };
 
@@ -137,13 +124,13 @@ export function ExamManager() {
         </div>
         <div className="space-y-2">
           <h1 className="text-4xl font-headline font-black text-primary">Hasil Akhir</h1>
-          <p className="text-muted-foreground text-lg">Performa kognitif terakumulasi.</p>
+          <p className="text-muted-foreground text-lg">Performa kognitif 6 sub-tes terakumulasi.</p>
         </div>
         <Card className="w-full max-w-md border-primary/20 shadow-2xl overflow-hidden">
           <div className="bg-primary p-8 text-white">
             <div className="text-sm font-bold uppercase tracking-widest opacity-80">Skor Anda</div>
             <div className="text-7xl font-black">{finalResults.totalScore}</div>
-            <div className="text-xs mt-2 opacity-70">1 poin per soal benar</div>
+            <div className="text-xs mt-2 opacity-70">Berdasarkan {finalResults.maxPossible} soal tersedia</div>
           </div>
           <CardContent className="p-6 grid grid-cols-2 gap-4 divide-x">
             <div className="text-center">
@@ -169,14 +156,12 @@ export function ExamManager() {
     <div className="max-w-4xl mx-auto space-y-8">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white/60 p-5 rounded-2xl border shadow-sm">
         <div className="space-y-1">
-          <span className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground/60">Sub-Tes {currentSubIndex + 1} / {SUBTESTS.length}</span>
-          <h2 className="text-2xl font-headline font-bold text-primary">{currentSubTest.name}</h2>
-          <div className="flex items-center gap-2 text-[10px] font-bold uppercase">
-            <Database className="w-3 h-3 text-primary" />
-            <span className={isCustomMode ? "text-accent" : "text-muted-foreground"}>
-              {isCustomMode ? "Bank Soal Kustom Aktif" : "Bank Soal Default"}
-            </span>
+          <div className="flex items-center gap-2">
+            <span className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground/60">Sub-Tes {currentSubIndex + 1} / {SUBTESTS.length}</span>
+            {isCustomMode && <Database className="w-3 h-3 text-accent" />}
           </div>
+          <h2 className="text-2xl font-headline font-bold text-primary">{currentSubTest.name}</h2>
+          <p className="text-xs text-muted-foreground italic">{currentSubTest.description}</p>
         </div>
         <SubTestTimer 
           key={`timer-${currentSubIndex}`}
@@ -203,9 +188,9 @@ export function ExamManager() {
             ) : (
               <>
                 <AlertCircle className="w-12 h-12 text-destructive" />
-                <p className="text-muted-foreground">Tidak ada soal tersedia untuk kategori ini.</p>
+                <p className="text-muted-foreground">Data soal untuk <b>{currentSubTest.name}</b> belum diinput.</p>
                 <Link href="/settings">
-                  <Button variant="outline">Periksa Pengaturan</Button>
+                  <Button variant="outline">Input Soal Manual</Button>
                 </Link>
               </>
             )}

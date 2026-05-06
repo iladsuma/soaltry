@@ -7,7 +7,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import Link from "next/link";
-import { ArrowLeft, Settings2, FileJson, Save, RotateCcw, Upload, Info } from "lucide-react";
+import { ArrowLeft, Settings2, FileJson, Save, RotateCcw, Upload, Info, CheckCircle2 } from "lucide-react";
 
 export default function SettingsPage() {
   const { toast } = useToast();
@@ -23,7 +23,7 @@ export default function SettingsPage() {
   const handleSave = () => {
     try {
       const parsed = JSON.parse(jsonInput);
-      const requiredKeys = ["language", "calculations", "general_knowledge"];
+      const requiredKeys = ["lang_fast", "lang_tricky", "gen_fast", "gen_random", "calc_easy", "calc_mixed"];
       const missingKeys = requiredKeys.filter(key => !parsed[key]);
       
       if (missingKeys.length > 0) {
@@ -38,7 +38,7 @@ export default function SettingsPage() {
       localStorage.setItem("custom_exam_questions", jsonInput);
       toast({
         title: "Berhasil Disimpan",
-        description: "Bank soal kustom Anda sekarang aktif untuk 3 sub-tes utama.",
+        description: "Bank soal kustom untuk 6 sub-tes intensif telah aktif.",
       });
     } catch (e) {
       toast({
@@ -86,7 +86,7 @@ export default function SettingsPage() {
             </Link>
             <div>
               <h1 className="text-3xl font-headline font-bold text-primary">Manajemen Bank Soal</h1>
-              <p className="text-muted-foreground">Sesuaikan soal ujian Bahasa, Hitungan, dan Umum Anda.</p>
+              <p className="text-muted-foreground">Konfigurasi 6 sub-tes (Total 228 Soal).</p>
             </div>
           </div>
           <Settings2 className="w-8 h-8 text-accent opacity-50" />
@@ -96,16 +96,24 @@ export default function SettingsPage() {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <FileJson className="w-5 h-5 text-primary" />
-              Input JSON Kustom (228 Soal)
+              Editor JSON (6 Sub-Tes)
             </CardTitle>
             <CardDescription>
-              Aplikasi ini membutuhkan total 228 soal (masing-masing 76 soal per kategori). Tempelkan JSON dari ChatGPT di bawah ini.
+              Tempelkan 228 soal kognitif yang telah dibagi ke dalam 6 kategori spesifik.
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-6">
+            <div className="grid grid-cols-2 md:grid-cols-3 gap-2 pb-4">
+              {["lang_fast", "lang_tricky", "gen_fast", "gen_random", "calc_easy", "calc_mixed"].map(key => (
+                <div key={key} className="flex items-center gap-2 p-2 rounded-lg bg-muted/50 border text-[10px] font-bold uppercase text-muted-foreground">
+                  <CheckCircle2 className="w-3 h-3 text-primary" /> {key}
+                </div>
+              ))}
+            </div>
+
             <div className="space-y-2">
               <div className="flex justify-between items-center">
-                <Label htmlFor="json-input" className="text-sm font-bold uppercase tracking-wider text-muted-foreground">Editor JSON</Label>
+                <Label htmlFor="json-input" className="text-sm font-bold uppercase tracking-wider text-muted-foreground">Data JSON</Label>
                 <div className="flex gap-2">
                   <input
                     type="file"
@@ -120,7 +128,7 @@ export default function SettingsPage() {
                     className="h-8 gap-1"
                     onClick={() => document.getElementById('file-upload')?.click()}
                   >
-                    <Upload className="w-3 h-3" /> Unggah File
+                    <Upload className="w-3 h-3" /> Unggah .json
                   </Button>
                   <Button 
                     variant="outline" 
@@ -134,7 +142,7 @@ export default function SettingsPage() {
               </div>
               <Textarea
                 id="json-input"
-                placeholder='{ "language": [...], "calculations": [...], "general_knowledge": [...] }'
+                placeholder='{ "lang_fast": [...], "lang_tricky": [...], ... }'
                 className="min-h-[400px] font-mono text-xs leading-relaxed"
                 value={jsonInput}
                 onChange={(e) => setJsonInput(e.target.value)}
@@ -146,7 +154,7 @@ export default function SettingsPage() {
                 <Button variant="ghost">Batal</Button>
               </Link>
               <Button className="bg-primary px-10 gap-2 font-bold" onClick={handleSave}>
-                <Save className="w-4 h-4" /> Simpan Perubahan
+                <Save className="w-4 h-4" /> Simpan Bank Soal
               </Button>
             </div>
           </CardContent>
@@ -155,15 +163,16 @@ export default function SettingsPage() {
         <Card className="bg-primary/5 border-dashed border-primary/30">
           <CardHeader>
             <CardTitle className="text-sm flex items-center gap-2">
-              <Info className="w-4 h-4" /> Catatan Penting
+              <Info className="w-4 h-4" /> Karakteristik 228 Soal
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-xs text-muted-foreground leading-relaxed">
-              Sub-tes visual (Pola, Abstraksi, Spasial) telah dinonaktifkan untuk menjaga akurasi soal berbasis teks. 
-              Sistem akan membagi 228 soal ke dalam 3 kategori utama secara otomatis. 
-              Pastikan setiap kategori memiliki jumlah soal yang cukup untuk simulasi yang maksimal.
-            </p>
+            <ul className="text-xs text-muted-foreground space-y-2 list-disc pl-4">
+              <li><b>Bahasa (Fast/Tricky):</b> Sinonim kilat & Pemahaman makna tersirat.</li>
+              <li><b>Umum (Fast/Random):</b> Fakta instan & Wawasan luas bervariasi.</li>
+              <li><b>Hitungan (Easy/Mixed):</b> Aritmatika refleks & Analisis taktis.</li>
+              <li>Setiap kategori idealnya memiliki <b>38 soal</b> untuk mencapai total 228.</li>
+            </ul>
           </CardContent>
         </Card>
       </div>

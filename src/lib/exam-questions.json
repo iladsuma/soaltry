@@ -1,38 +1,32 @@
 {
-  "language": [
-    { "question": "Sinonim dari 'Efisien' adalah...", "options": ["Tepat Guna", "Hemat", "Cepat", "Berdaya"], "answer": "Tepat Guna" },
-    { "question": "Antonim dari 'Progresif' adalah...", "options": ["Stagnan", "Maju", "Aktif", "Regresif"], "answer": "Regresif" },
-    { "question": "Analogi: Haus : Air = Lapar : ...", "options": ["Makan", "Nasi", "Haus", "Kenyang"], "answer": "Nasi" },
-    { "question": "Padanan kata dari 'Iterasi' adalah...", "options": ["Perulangan", "Pembagian", "Pengurangan", "Penjumlahan"], "answer": "Perulangan" },
-    { "question": "Sinonim dari 'Ambigu' adalah...", "options": ["Bermakna ganda", "Jelas", "Pasti", "Terang"], "answer": "Bermakna ganda" },
-    { "question": "Manakah penulisan yang baku?", "options": ["Apotik", "Apotek", "Apotika", "Apoteker"], "answer": "Apotek" },
-    { "question": "Antonim dari 'Sekuler' adalah...", "options": ["Duniawi", "Agamis", "Netral", "Bebas"], "answer": "Agamis" },
-    { "question": "Padanan kata 'Konfrontasi' adalah...", "options": ["Pertikaian", "Perdamaian", "Kesepakatan", "Pertemuan"], "answer": "Pertikaian" },
-    { "question": "Sinonim 'Fundamental' adalah...", "options": ["Mendasar", "Tambahan", "Sekunder", "Sepele"], "answer": "Mendasar" },
-    { "question": "Antonim 'Eksklusif' adalah...", "options": ["Umum", "Terbatas", "Khusus", "Istimewa"], "answer": "Umum" }
+  "lang_fast": [
+    { "question": "Sinonim: ITERASI", "options": ["Perulangan", "Pembagian", "Penghapusan", "Percepatan"], "answer": "Perulangan" },
+    { "question": "Antonim: PROGRESIF", "options": ["Maju", "Stagnan", "Regresif", "Aktif"], "answer": "Regresif" },
+    { "question": "Makna: AMBIGU", "options": ["Jelas", "Bermakna ganda", "Satu arti", "Terang"], "answer": "Bermakna ganda" },
+    { "question": "Sinonim: FUNDAMENTAL", "options": ["Tambahan", "Mendasar", "Sekunder", "Sepele"], "answer": "Mendasar" },
+    { "question": "Antonim: SEKULER", "options": ["Duniawi", "Agamis", "Bebas", "Netral"], "answer": "Agamis" }
   ],
-  "calculations": [
-    { "question": "Berapakah 15% dari 200?", "options": ["20", "30", "40", "50"], "answer": "30" },
-    { "question": "Jika x + 5 = 12, maka nilai x adalah...", "options": ["5", "7", "8", "9"], "answer": "7" },
-    { "question": "Hasil dari 12 x 12 - 44 adalah...", "options": ["100", "110", "120", "80"], "answer": "100" },
-    { "question": "3, 6, 12, 24, ... Angka selanjutnya adalah?", "options": ["36", "42", "48", "50"], "answer": "48" },
-    { "question": "Jika 3 buku seharga Rp 15.000, berapa harga 5 buku?", "options": ["Rp 20.000", "Rp 25.000", "Rp 30.000", "Rp 35.000"], "answer": "Rp 25.000" },
-    { "question": "0,5 x 0,2 adalah...", "options": ["0,1", "0,01", "1,0", "0,11"], "answer": "0,1" },
-    { "question": "Berapakah akar kuadrat dari 144?", "options": ["10", "11", "12", "14"], "answer": "12" },
-    { "question": "Jika a=2 dan b=3, maka (a+b) kuadrat adalah...", "options": ["10", "13", "25", "26"], "answer": "25" },
-    { "question": "25% dari 80 adalah...", "options": ["15", "20", "25", "30"], "answer": "20" },
-    { "question": "Jika 10 orang menyelesaikan pekerjaan dalam 2 hari, berapa orang untuk 1 hari?", "options": ["5", "10", "15", "20"], "answer": "20" }
+  "lang_tricky": [
+    { "question": "Manakah kalimat yang bermakna tersirat 'penolakan halus'?", "options": ["Saya tidak bisa datang.", "Mungkin lain kali saya usahakan.", "Saya pasti datang terlambat.", "Jangan ajak saya lagi."], "answer": "Mungkin lain kali saya usahakan." },
+    { "question": "'Anak itu keras kepala seperti batu'. Makna batu di sini adalah...", "options": ["Benda mati", "Sangat kuat", "Sulit dinasehati", "Dingin"], "answer": "Sulit dinasehati" },
+    { "question": "Opsi mana yang paling tepat melengkapi: 'Meskipun lelah, ia ... bekerja.'", "options": ["Tetap", "Sering", "Kadang", "Berhenti"], "answer": "Tetap" }
   ],
-  "general_knowledge": [
-    { "question": "Siapakah Presiden pertama Republik Indonesia?", "options": ["Soeharto", "Soekarno", "B.J. Habibie", "Gus Dur"], "answer": "Soekarno" },
-    { "question": "Ibu kota negara Jepang adalah...", "options": ["Seoul", "Beijing", "Tokyo", "Bangkok"], "answer": "Tokyo" },
-    { "question": "Planet manakah yang dijuluki Planet Merah?", "options": ["Venus", "Mars", "Jupiter", "Saturnus"], "answer": "Mars" },
-    { "question": "Mata uang negara Inggris adalah...", "options": ["Euro", "Dollar", "Poundsterling", "Yen"], "answer": "Poundsterling" },
+  "gen_fast": [
+    { "question": "Ibu kota Jepang adalah...", "options": ["Seoul", "Beijing", "Tokyo", "Bangkok"], "answer": "Tokyo" },
+    { "question": "Penemu bola lampu adalah...", "options": ["Einstein", "Newton", "Edison", "Tesla"], "answer": "Edison" },
+    { "question": "Mata uang Inggris adalah...", "options": ["Euro", "Dollar", "Poundsterling", "Yen"], "answer": "Poundsterling" }
+  ],
+  "gen_random": [
     { "question": "Benua terkecil di dunia adalah...", "options": ["Asia", "Eropa", "Australia", "Afrika"], "answer": "Australia" },
-    { "question": "Siapakah penemu bola lampu?", "options": ["Albert Einstein", "Isaac Newton", "Thomas Alva Edison", "Nikola Tesla"], "answer": "Thomas Alva Edison" },
-    { "question": "Negara dengan populasi terbanyak di dunia adalah...", "options": ["India", "Cina", "Amerika Serikat", "Indonesia"], "answer": "India" },
-    { "question": "Samudra terluas di dunia adalah...", "options": ["Hindia", "Atlantik", "Pasifik", "Arktik"], "answer": "Pasifik" },
-    { "question": "Lagu kebangsaan Indonesia Raya diciptakan oleh...", "options": ["Ibu Sud", "W.R. Supratman", "C. Simanjuntak", "Ismail Marzuki"], "answer": "W.R. Supratman" },
-    { "question": "Sandi Morse menggunakan kombinasi...", "options": ["Angka", "Huruf", "Titik dan Garis", "Warna"], "answer": "Titik dan Garis" }
+    { "question": "Lagu Indonesia Raya diciptakan oleh...", "options": ["Ibu Sud", "W.R. Supratman", "Ismail Marzuki", "C. Simanjuntak"], "answer": "W.R. Supratman" }
+  ],
+  "calc_easy": [
+    { "question": "15% dari 200 adalah...", "options": ["20", "30", "40", "50"], "answer": "30" },
+    { "question": "12 x 12 - 44 = ...", "options": ["100", "110", "120", "80"], "answer": "100" },
+    { "question": "Jika x + 7 = 15, maka x = ...", "options": ["6", "7", "8", "9"], "answer": "8" }
+  ],
+  "calc_mixed": [
+    { "question": "Jika 3 buku seharga 15.000, berapa harga 1 lusin buku?", "options": ["45.000", "60.000", "75.000", "180.000"], "answer": "60.000" },
+    { "question": "Hasil dari (2+3) kuadrat - (4x2) = ...", "options": ["15", "17", "20", "25"], "answer": "17" }
   ]
 }
