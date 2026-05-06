@@ -2,11 +2,11 @@
 import type {Metadata} from 'next';
 import './globals.css';
 import { Toaster } from "@/components/ui/toaster";
-import { FirebaseErrorListener } from "@/components/FirebaseErrorListener";
+import { ErrorSimulationListener } from "@/components/ErrorSimulationListener";
 
 export const metadata: Metadata = {
-  title: 'CogniFlow | Try Out Kognitif Fokus',
-  description: 'Uji potensi intelektual Anda dengan 228 soal kognitif intensif dalam 3 sub-tes utama.',
+  title: 'CogniFlow | Try Out Kognitif Lokal',
+  description: 'Uji potensi intelektual Anda dengan 228 soal kognitif intensif secara offline.',
 };
 
 export default function RootLayout({
@@ -23,7 +23,7 @@ export default function RootLayout({
       </head>
       <body className="font-body antialiased bg-background text-foreground">
         {children}
-        <FirebaseErrorListener />
+        <ErrorSimulationListener />
         <Toaster />
       </body>
     </html>

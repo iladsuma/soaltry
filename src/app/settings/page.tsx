@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState, useEffect } from "react";
@@ -7,9 +8,9 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import Link from "next/link";
-import { ArrowLeft, Settings2, FileJson, Save, RotateCcw, Upload, Info, BarChart3, Bug } from "lucide-react";
-import { errorEmitter } from "@/firebase/error-emitter";
-import { FirestorePermissionError } from "@/firebase/errors";
+import { ArrowLeft, Settings2, FileJson, Save, RotateCcw, Upload, BarChart3, Bug } from "lucide-react";
+import { errorEmitter } from "@/lib/error-emitter";
+import { SimulatedPermissionError } from "@/lib/errors";
 
 export default function SettingsPage() {
   const { toast } = useToast();
@@ -49,9 +50,7 @@ export default function SettingsPage() {
 
   const handleSave = () => {
     try {
-      // Validasi hanya mengecek apakah ini JSON valid
       JSON.parse(jsonInput);
-
       localStorage.setItem("custom_exam_questions", jsonInput);
       calculateStats(jsonInput);
       
@@ -79,11 +78,11 @@ export default function SettingsPage() {
     });
   };
 
-  const simulatePermissionError = () => {
-    const error = new FirestorePermissionError({
-      path: '/databases/(default)/documents/bank_soal/custom_data',
-      operation: 'update',
-      requestResourceData: { totalQuestions: totalCount, lastUpdated: new Date().toISOString() }
+  const simulateGlitchError = () => {
+    const error = new SimulatedPermissionError({
+      path: '/localstorage/bank_soal/data',
+      operation: 'write',
+      requestResourceData: { status: "Syncing...", questions: totalCount }
     });
     errorEmitter.emit('permission-error', error);
   };
@@ -117,11 +116,11 @@ export default function SettingsPage() {
             </Link>
             <div>
               <h1 className="text-3xl font-headline font-bold text-primary">Manajemen Bank Soal</h1>
-              <p className="text-muted-foreground">Konfigurasi bebas (Input soal seperlunya).</p>
+              <p className="text-muted-foreground">Input soal fleksibel via JSON (Offline).</p>
             </div>
           </div>
           <div className="flex gap-2">
-            <Button variant="outline" size="sm" className="rounded-full border-dashed" onClick={simulatePermissionError}>
+            <Button variant="outline" size="sm" className="rounded-full border-dashed" onClick={simulateGlitchError}>
               <Bug className="w-4 h-4 mr-2" /> Simulasi Error
             </Button>
             <Settings2 className="w-8 h-8 text-accent opacity-50" />
@@ -133,10 +132,10 @@ export default function SettingsPage() {
             <div className="flex items-center justify-between mb-4">
               <div className="flex items-center gap-2 text-primary font-bold">
                 <BarChart3 className="w-5 h-5" />
-                <span>Statistik Input Soal</span>
+                <span>Statistik Bank Soal</span>
               </div>
               <div className="px-4 py-1 bg-primary text-white rounded-full font-black text-xl shadow-lg">
-                {totalCount} <span className="text-xs font-normal opacity-80 uppercase">Total Soal</span>
+                {totalCount} <span className="text-xs font-normal opacity-80 uppercase">Soal Terdeteksi</span>
               </div>
             </div>
             <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
@@ -154,10 +153,10 @@ export default function SettingsPage() {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <FileJson className="w-5 h-5 text-primary" />
-              Editor JSON Fleksibel
+              Editor JSON Soal
             </CardTitle>
             <CardDescription>
-              Masukkan soal kustom Anda. Tidak perlu mengisi semua kategori. Kategori yang kosong akan otomatis dilewati saat ujian.
+              Isi kategori yang Anda butuhkan saja. Simpan soal kustom Anda di sini secara aman dan offline di browser.
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-6">
