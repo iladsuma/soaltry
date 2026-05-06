@@ -82,13 +82,13 @@ export function ExamManager() {
     setCurrentQIndex(0);
   }, [fetchQuestions]);
 
-  const handleNextSubTest = () => {
+  const handleNextSubTest = useCallback(() => {
     if (currentSubIndex < SUBTESTS.length - 1) {
       setCurrentSubIndex(prev => prev + 1);
     } else {
       setIsCompleted(true);
     }
-  };
+  }, [currentSubIndex]);
 
   const handleSaveAndContinue = async () => {
     setIsSaving(true);
@@ -136,7 +136,7 @@ export function ExamManager() {
     let score = 0;
     allQuestionsRecord.forEach(q => {
       const userAnswer = answers[q.id];
-      if (String(userAnswer).trim().toLowerCase() === String(q.answer).trim().toLowerCase()) {
+      if (userAnswer && String(userAnswer).trim().toLowerCase() === String(q.answer).trim().toLowerCase()) {
         score += 1;
       }
     });
@@ -183,7 +183,6 @@ export function ExamManager() {
     );
   }
 
-  const currentQuestion = questions[currentQIndex];
   const progressPercent = ((currentSubIndex * 100) + ((currentQIndex / Math.max(1, questions.length)) * 100)) / SUBTESTS.length;
 
   return (
@@ -211,11 +210,11 @@ export function ExamManager() {
               {[1, 2, 3, 4].map(i => <Skeleton key={i} className="h-16 w-full" />)}
             </div>
           </div>
-        ) : currentQuestion ? (
+        ) : questions[currentQIndex] ? (
           <QuestionCard 
-            key={currentQuestion.id} 
-            question={currentQuestion} 
-            value={answers[currentQuestion.id] || ''} 
+            key={questions[currentQIndex].id} 
+            question={questions[currentQIndex]} 
+            value={answers[questions[currentQIndex].id] || ''} 
             onChange={updateAnswer} 
           />
         ) : (

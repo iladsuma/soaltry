@@ -21,21 +21,21 @@ export function SubTestTimer({ initialSeconds, onExpire, isActive }: SubTestTime
     if (!isActive || timeLeft <= 0) return;
 
     const timer = setInterval(() => {
-      setTimeLeft((prev) => {
-        if (prev <= 1) {
-          clearInterval(timer);
-          onExpire();
-          return 0;
-        }
-        return prev - 1;
-      });
+      setTimeLeft((prev) => Math.max(0, prev - 1));
     }, 1000);
 
     return () => clearInterval(timer);
-  }, [isActive, timeLeft, onExpire]);
+  }, [isActive, timeLeft]);
 
-  const minutes = Math.floor(timeLeft / 60);
-  const seconds = timeLeft % 60;
+  // Handle expiration in a separate effect to avoid side-effects during render or state updates of children
+  useEffect(() => {
+    if (timeLeft === 0 && isActive) {
+      onExpire();
+    }
+  }, [timeLeft, isActive, onExpire]);
+
+  const minutes = Math.floor(Math.max(0, timeLeft) / 60);
+  const seconds = Math.max(0, timeLeft) % 60;
 
   return (
     <div className={cn(
