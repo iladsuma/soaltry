@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState, useEffect, useCallback, useMemo } from "react";
@@ -8,7 +9,7 @@ import { QuestionCard } from "./QuestionCard";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { useToast } from "@/hooks/use-toast";
-import { ArrowRight, Loader2, Trophy, AlertCircle, Database, Info } from "lucide-react";
+import { ArrowRight, Loader2, Trophy, AlertCircle, Database } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import Link from "next/link";
 
@@ -17,34 +18,39 @@ export function ExamManager() {
   const [currentSubIndex, setCurrentSubIndex] = useState(0);
   const [currentQIndex, setCurrentQIndex] = useState(0);
   const [questions, setQuestions] = useState<Question[]>([]);
-  const [allQuestionsRecord, setAllQuestionsRecord] = useState<Question[]>([]);
+  const [fullBank, setFullBank] = useState<Record<string, any>>({});
   const [answers, setAnswers] = useState<Record<string, string>>({});
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
   const [isCompleted, setIsCompleted] = useState(false);
   const [isCustomMode, setIsCustomMode] = useState(false);
 
-  const currentSubTest = SUBTESTS[currentSubIndex];
-
-  const loadQuestions = useCallback(() => {
+  // 1. Load the entire bank once on mount
+  useEffect(() => {
     setIsLoading(true);
-    const config = SUBTESTS[currentSubIndex];
-    
-    let activeData = defaultExamData;
     const customSaved = localStorage.getItem("custom_exam_questions");
-    
+    let activeData = defaultExamData;
+
     if (customSaved) {
       try {
         activeData = JSON.parse(customSaved);
         setIsCustomMode(true);
       } catch (e) {
+        console.error("Failed to parse custom JSON, falling back to default.");
         setIsCustomMode(false);
       }
-    } else {
-      setIsCustomMode(false);
     }
 
-    const rawData = (activeData as any)[config.id] || [];
+    setFullBank(activeData);
+    setIsLoading(false);
+  }, []);
+
+  // 2. Set questions for the current sub-test when bank or index changes
+  useEffect(() => {
+    if (Object.keys(fullBank).length === 0) return;
+
+    const config = SUBTESTS[currentSubIndex];
+    const rawData = (fullBank as any)[config.id] || [];
     
     const loaded: Question[] = rawData.map((q: any, i: number) => ({
       ...q,
@@ -53,19 +59,8 @@ export function ExamManager() {
     }));
 
     setQuestions(loaded);
-    
-    setAllQuestionsRecord(prev => {
-      const otherSubTests = prev.filter(p => p.type !== config.id);
-      return [...otherSubTests, ...loaded];
-    });
-
-    setIsLoading(false);
-  }, [currentSubIndex]);
-
-  useEffect(() => {
-    loadQuestions();
     setCurrentQIndex(0);
-  }, [loadQuestions]);
+  }, [currentSubIndex, fullBank]);
 
   const handleNextSubTest = useCallback(() => {
     if (currentSubIndex < SUBTESTS.length - 1) {
@@ -81,11 +76,9 @@ export function ExamManager() {
 
   const handleSaveAndContinue = async () => {
     setIsSaving(true);
-    
-    // Simulate minor delay for UX
-    await new Promise(resolve => setTimeout(resolve, 150));
-    
+    await new Promise(resolve => setTimeout(resolve, 100));
     setIsSaving(false);
+    
     if (currentQIndex < questions.length - 1) {
       setCurrentQIndex(prev => prev + 1);
     } else {
@@ -103,18 +96,27 @@ export function ExamManager() {
   const finalResults = useMemo(() => {
     if (!isCompleted) return null;
     let score = 0;
-    allQuestionsRecord.forEach(q => {
-      const userAnswer = answers[q.id];
-      if (userAnswer && String(userAnswer).trim().toLowerCase() === String(q.answer).trim().toLowerCase()) {
-        score += 1;
-      }
+    let totalPossible = 0;
+
+    SUBTESTS.forEach(config => {
+      const subQuestions = (fullBank as any)[config.id] || [];
+      totalPossible += subQuestions.length;
+      
+      subQuestions.forEach((q: any, i: number) => {
+        const qId = `${config.id}-${i}`;
+        const userAnswer = answers[qId];
+        if (userAnswer && String(userAnswer).trim().toLowerCase() === String(q.answer).trim().toLowerCase()) {
+          score += 1;
+        }
+      });
     });
+
     return {
       totalScore: score,
-      maxPossible: allQuestionsRecord.length,
+      maxPossible: totalPossible,
       answeredCount: Object.keys(answers).length
     };
-  }, [isCompleted, allQuestionsRecord, answers]);
+  }, [isCompleted, fullBank, answers]);
 
   if (isCompleted && finalResults) {
     return (
@@ -150,6 +152,7 @@ export function ExamManager() {
     );
   }
 
+  const currentSubTest = SUBTESTS[currentSubIndex];
   const progressPercent = ((currentSubIndex * 100) + ((currentQIndex / Math.max(1, questions.length)) * 100)) / SUBTESTS.length;
 
   return (
@@ -158,7 +161,7 @@ export function ExamManager() {
         <div className="space-y-1">
           <div className="flex items-center gap-2">
             <span className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground/60">Sub-Tes {currentSubIndex + 1} / {SUBTESTS.length}</span>
-            {isCustomMode && <Database className="w-3 h-3 text-accent" />}
+            {isCustomMode && <Database className="w-3 h-3 text-accent" title="Menggunakan Bank Soal Kustom" />}
           </div>
           <h2 className="text-2xl font-headline font-bold text-primary">{currentSubTest.name}</h2>
           <p className="text-xs text-muted-foreground italic">{currentSubTest.description}</p>
@@ -188,9 +191,13 @@ export function ExamManager() {
             ) : (
               <>
                 <AlertCircle className="w-12 h-12 text-destructive" />
-                <p className="text-muted-foreground">Data soal untuk <b>{currentSubTest.name}</b> belum diinput.</p>
+                <p className="text-muted-foreground">
+                  Data soal untuk <b>{currentSubTest.name}</b> tidak ditemukan dalam JSON.
+                  <br />
+                  <span className="text-[10px] opacity-70">Pastikan kunci JSON adalah "{currentSubTest.id}"</span>
+                </p>
                 <Link href="/settings">
-                  <Button variant="outline">Input Soal Manual</Button>
+                  <Button variant="outline">Cek Pengaturan</Button>
                 </Link>
               </>
             )}
