@@ -2,7 +2,7 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-import { SUBTESTS, Question, SubTestType } from "@/lib/types";
+import { SUBTESTS, Question } from "@/lib/types";
 import { languageQuestions, patternQuestions, abstractionQuestions, spatialQuestions } from "@/lib/mock-data";
 import { generateCalculationProblems } from "@/ai/flows/generate-calculation-problems";
 import { generateGeneralKnowledgeQuestions } from "@/ai/flows/generate-general-knowledge-questions";
@@ -11,7 +11,7 @@ import { QuestionCard } from "./QuestionCard";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { useToast } from "@/hooks/use-toast";
-import { ChevronRight, Save, CheckCircle2, AlertTriangle, ArrowRight, Loader2 } from "lucide-react";
+import { ArrowRight, Loader2, CheckCircle2, AlertCircle } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 
 export function ExamManager() {
@@ -53,15 +53,13 @@ export function ExamManager() {
           answer: q.answer,
         }));
       } else {
-        // Use pre-defined static mock data for others
         const mockMap: Record<string, Question[]> = {
           language: languageQuestions,
           patterns: patternQuestions,
           abstraction: abstractionQuestions,
           spatial: spatialQuestions
         };
-        loaded = mockMap[config.id] || [];
-        // Ensure unique IDs per sub-test run
+        loaded = [...(mockMap[config.id] || [])];
         loaded = loaded.map((q, i) => ({ ...q, id: `${q.id}-${currentSubIndex}` }));
       }
       setQuestions(loaded);
@@ -88,12 +86,33 @@ export function ExamManager() {
 
   const handleSaveAndContinue = async () => {
     setIsSaving(true);
+    const currentQ = questions[currentQIndex];
     
-    // Simulate a small network delay for a more natural feel without random errors
-    await new Promise(resolve => setTimeout(resolve, 300));
+    // REPLIKASI GLITCH KOPDES:
+    // 1. Simulasi delay server yang tidak stabil
+    await new Promise(resolve => setTimeout(resolve, 800));
 
+    // 2. Simulasi probabilitas kegagalan simpan (40% chance)
+    const isGlitch = Math.random() < 0.4;
+
+    if (isGlitch) {
+      // 3. Efek visual jawaban berubah tepat sebelum error
+      if (currentQ && currentQ.options) {
+        const randomOption = currentQ.options[Math.floor(Math.random() * currentQ.options.length)];
+        setAnswers(prev => ({ ...prev, [currentQ.id]: randomOption }));
+      }
+
+      setIsSaving(false);
+      toast({
+        title: "Koneksi Terputus / Error Server",
+        description: "Gagal menyimpan jawaban. Jawaban mungkin tidak tercatat atau berubah. Silakan periksa kembali soal ini.",
+        variant: "destructive",
+      });
+      return; // Berhenti di sini, memaksa user klik lagi atau cek jawaban
+    }
+
+    // Jika berhasil (60% chance)
     setIsSaving(false);
-    
     if (currentQIndex < questions.length - 1) {
       setCurrentQIndex(prev => prev + 1);
     } else {
@@ -130,7 +149,6 @@ export function ExamManager() {
 
   return (
     <div className="max-w-4xl mx-auto space-y-8 animate-in slide-in-from-bottom-4 duration-500">
-      {/* Header Info */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white/50 backdrop-blur-sm p-4 rounded-xl border border-white/80 shadow-sm">
         <div className="space-y-1">
           <div className="flex items-center gap-2">
@@ -145,7 +163,6 @@ export function ExamManager() {
         />
       </div>
 
-      {/* Progress Bar */}
       <div className="space-y-2">
         <div className="flex justify-between text-xs font-medium text-muted-foreground">
           <span>Progress Keseluruhan</span>
@@ -154,7 +171,6 @@ export function ExamManager() {
         <Progress value={progressPercent} className="h-2 bg-white border border-accent/20" />
       </div>
 
-      {/* Main Content */}
       <div className="min-h-[400px] flex flex-col justify-center">
         {isLoading ? (
           <div className="space-y-4 max-w-2xl mx-auto w-full">
@@ -164,7 +180,7 @@ export function ExamManager() {
           </div>
         ) : currentQuestion ? (
           <QuestionCard 
-            key={currentQuestion.id} // Sangat penting: Mereset UI saat soal berubah
+            key={currentQuestion.id} 
             question={currentQuestion} 
             value={answers[currentQuestion.id] || ''} 
             onChange={updateAnswer} 
@@ -174,7 +190,6 @@ export function ExamManager() {
         )}
       </div>
 
-      {/* Actions */}
       <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-4">
         <div className="text-sm font-medium text-muted-foreground">
           Soal {currentQIndex + 1} dari {questions.length}
@@ -203,12 +218,11 @@ export function ExamManager() {
           </Button>
         </div>
       </div>
-
-      {/* Config Option Link */}
-      <div className="pt-10 text-center">
-        <Button variant="link" className="text-muted-foreground hover:text-primary text-xs" onClick={() => window.location.href = '/settings'}>
-          Konfigurasi Soal Sub-tes
-        </Button>
+      
+      {/* Indikator Peringatan untuk menambah nuansa ketegangan */}
+      <div className="flex items-center justify-center gap-2 text-[10px] text-muted-foreground uppercase tracking-widest opacity-30">
+        <AlertCircle className="w-3 h-3" />
+        Sistem Stabilizer: Active (Low Confidence)
       </div>
     </div>
   );
