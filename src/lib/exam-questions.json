@@ -1,4 +1,3 @@
-
 {
   "lang_fast": [
     { "question": "Sinonim: ITERASI", "options": ["Perulangan", "Pembagian", "Penghapusan", "Percepatan"], "answer": "Perulangan" },
@@ -9,13 +8,11 @@
   ],
   "lang_tricky": [
     { "question": "Manakah kalimat yang bermakna tersirat 'penolakan halus'?", "options": ["Saya tidak bisa datang.", "Mungkin lain kali saya usahakan.", "Saya pasti datang terlambat.", "Jangan ajak saya lagi."], "answer": "Mungkin lain kali saya usahakan." },
-    { "question": "'Anak itu keras kepala seperti batu'. Makna batu di sini adalah...", "options": ["Benda mati", "Sangat kuat", "Sulit dinasehati", "Dingin"], "answer": "Sulit dinasehati" },
-    { "question": "Opsi mana yang paling tepat melengkapi: 'Meskipun lelah, ia ... bekerja.'", "options": ["Tetap", "Sering", "Kadang", "Berhenti"], "answer": "Tetap" }
+    { "question": "'Anak itu keras kepala seperti batu'. Makna batu di sini adalah...", "options": ["Benda mati", "Sangat kuat", "Sulit dinasehati", "Dingin"], "answer": "Sulit dinasehati" }
   ],
   "gen_fast": [
     { "question": "Ibu kota Jepang adalah...", "options": ["Seoul", "Beijing", "Tokyo", "Bangkok"], "answer": "Tokyo" },
-    { "question": "Penemu bola lampu adalah...", "options": ["Einstein", "Newton", "Edison", "Tesla"], "answer": "Edison" },
-    { "question": "Mata uang Inggris adalah...", "options": ["Euro", "Dollar", "Poundsterling", "Yen"], "answer": "Poundsterling" }
+    { "question": "Penemu bola lampu adalah...", "options": ["Einstein", "Newton", "Edison", "Tesla"], "answer": "Edison" }
   ],
   "gen_random": [
     { "question": "Benua terkecil di dunia adalah...", "options": ["Asia", "Eropa", "Australia", "Afrika"], "answer": "Australia" },
@@ -23,8 +20,7 @@
   ],
   "calc_easy": [
     { "question": "15% dari 200 adalah...", "options": ["20", "30", "40", "50"], "answer": "30" },
-    { "question": "12 x 12 - 44 = ...", "options": ["100", "110", "120", "80"], "answer": "100" },
-    { "question": "Jika x + 7 = 15, maka x = ...", "options": ["6", "7", "8", "9"], "answer": "8" }
+    { "question": "12 x 12 - 44 = ...", "options": ["100", "110", "120", "80"], "answer": "100" }
   ],
   "calc_mixed": [
     { "question": "Jika 3 buku seharga 15.000, berapa harga 1 lusin buku?", "options": ["45.000", "60.000", "75.000", "180.000"], "answer": "60.000" },
